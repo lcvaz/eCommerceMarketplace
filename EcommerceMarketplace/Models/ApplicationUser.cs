@@ -21,6 +21,9 @@ public class ApplicationUser : IdentityUser
     public DateTime CriadoEm { get; } = DateTime.UtcNow; 
     
     
+    public string FullName { get; set; } = string.Empty;
+
+
     /// <summary>
     /// CPF do usuário (específico do Brasil)
     /// O ? torna nullable - nem todo usuário precisa ter CPF
@@ -32,17 +35,17 @@ public class ApplicationUser : IdentityUser
     // Por exemplo, um usuário com a role "Admin" pode ter um relacionamento com a tabela "Admin"
 
     // O vendedor terá lojas 
-    public virtual ICollection<Store> Stores { get; set; } = new List<Store>();
+    public ICollection<Store> Stores { get; set; } = new List<Store>();
 
     // O cliente terá pedidos 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     // O cliente terá endereços de entrega
-    public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
+    public ICollection<Address> Addresses { get; set; } = new List<Address>();
 
     // O cliente terá avaliações feitas
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
         
     // O cliente terá carrinho , porém não obrigatoriamente 
-    public virtual Cart? Cart { get; set; }
+    public Cart? Cart { get; set; }
 }
