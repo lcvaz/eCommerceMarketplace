@@ -13,7 +13,7 @@ public class Store
     /// ID da loja
     /// </summary>
     [Key]
-    public int IdStore { get; set; }
+    public int Id { get; set; }
 
 
     /// <summary>
@@ -52,7 +52,7 @@ public class Store
     /// Essa sintaxe é para inicializar o campo com a data e hora atual 
     /// Sem o set na propriedade o valor será sempre a data e hora atual e não será alterado
     /// </summary>
-    public DateTime CriadoEm { get; } = DateTime.UtcNow; 
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; 
     
 
     /// <summary>
@@ -61,21 +61,6 @@ public class Store
     public StoreStatus Status { get; set; } = StoreStatus.Active;
 
     
-    /// <summary>
-    /// avaliação da loja de 0 a 5
-    /// </summary>
-    public int avaliacao 
-    { 
-        get; 
-        set {
-            // calcula a média da lista de avaliações 
-            //if (ListaDeAvaliacoes.Count > 0)
-            //{
-            //    return (int)Math.Round(ListaDeAvaliacoes.Average(r => r.Avaliacao));
-            //}
-            //return 0;
-        }; 
-    }
     
 
     // ========== FOREIGN KEY ==========

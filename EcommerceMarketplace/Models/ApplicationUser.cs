@@ -18,7 +18,7 @@ public class ApplicationUser : IdentityUser
     /// essa sintaxe é para inicializar o campo com a data e hora atual 
     /// sem o set na propriedade o valor será sempre a data e hora atual e não será alterado
     /// </summary>
-    public DateTime CriadoEm { get; } = DateTime.UtcNow; 
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; 
     
     
     public string FullName { get; set; } = string.Empty;
