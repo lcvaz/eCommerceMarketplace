@@ -92,7 +92,7 @@ public class Store
     /// <summary>
     /// Avaliações recebidas por esta loja
     /// </summary>
-    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<ReviewStore> ReviewStore { get; set; } = new List<Review>();
 
 
 
@@ -101,7 +101,7 @@ public class Store
     
     /// <summary>
     /// Avaliação média da loja (0 a 5)
-    /// Calcula automaticamente baseado nas reviews
+    /// Calcula automaticamente baseado nas ReviewStoretore
     /// [NotMapped] significa que não cria coluna no banco
     /// </summary>
     [NotMapped]
@@ -109,10 +109,10 @@ public class Store
     {
         get
         {
-            if (Reviews == null || Reviews.Count == 0)
+            if (ReviewStoretore == null || ReviewStoretore.Count == 0)
                 return 0; // FAZER ALTERAÇÃO NA LÓGICA
             
-            return Math.Round(Reviews.Average(r => r.Rating), 1);
+            return Math.Round(ReviewStoretore.Average(r => r.Rating), 1);
         }
     }
 
@@ -122,7 +122,7 @@ public class Store
     /// Total de avaliações recebidas
     /// </summary>
     [NotMapped]
-    public int TotalReviews => Reviews?.Count ?? 0;
+    public int TotalReviewStoretore => ReviewStore?.Count ?? 0;
 
 }
 
