@@ -1,113 +1,124 @@
-namespace EcommerceMarketplace.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+namespace EcommerceMarketplace.Models;
+
 /// <summary>
 /// Product representa um produto de uma loja 
-/// Cada loja pode ter vários produtos
 /// </summary> 
-
-public class Product 
+public class Product
 {
-    /// <summary>
-    /// ID do produto
-    /// </summary>
-    [Key]
+    [Required(ErrorMessage = "O ID do produto é obrigatório")]
     public int Id { get; set; }
 
-
-    /// <summary>
-    /// Nome do material
-    /// Não pode ser nulo nem maior que 100 caracteres
-    /// </summary>
     [Required(ErrorMessage = "O nome do produto é obrigatório")]
-    [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres")]
+    [StringLength(200)]
     public string Name { get; set; } = string.Empty;
 
-
-    /// <summary>
-    /// Descrição
-    /// </summary>
-    [StringLength(500)]
+    [StringLength(2000)]
     public string? Description { get; set; }
 
-
-
     /// <summary>
-    /// Data de modificação do produto
-    /// </summary>
-    public DateTime ModifiedAt { get; set; } = DateTime.UtcNow; 
-    
-
-    /// <summary>
-    /// Status do produto no sistema
-    /// </summary>
-    public StoreStatus Status { get; set; } = StoreStatus.Active;
-
-    
-    
-    /// <summary>
-    /// Preço do produto no sistema
-    /// </summary>
-    [Required(ErrorMessage = "O nome do produto é obrigatório")]
-    public decimal Price { get; set; };
-
-
-    // ========== FOREIGN KEY ==========
-
-    /// <summary>
-    /// ID da loja 
+    /// Preço do produto
     /// </summary>
     [Required]
-    public string StoreId { get; set; } = string.Empty;
-
-
-    // ========== Conexões de produto ==========
+    [Column(TypeName = "decimal(18,2)")] 
+    public decimal Price { get; set; }  
 
     /// <summary>
-    /// O produto tem ReviewProduct
+    /// Quantidade em estoque
     /// </summary>
-    public ReviewProduct ReviewProduct { get; set; } = null!;
+    [Required]
+    public int Stock { get; set; } = 0;
 
+    /// <summary>
+    /// SKU - Código único do produto
+    /// </summary>
+    [StringLength(50)]
+    public string SKU { get; set; }
 
+    /// <summary>
+    /// URL da imagem principal do produto
+    /// </summary>
+    [Url(ErrorMessage = "URL inválida")]
+    public string ImageUrl { get; set; }
 
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Status do produto
+    /// </summary>
+    public ProductStatus Status { get; set; } = ProductStatus.Available;
+
+    // ========== FOREIGN KEYS ==========
+
+    /// <summary>
+    /// ID da loja dona do produto
+    /// </summary>
+    [Required]
+    public int StoreId { get; set; }  
+
+    /// <summary>
+    /// ID da categoria (opcional)
+    /// </summary>
+    public int? CategoryId { get; set; }
+
+    // ========== NAVIGATION PROPERTIES ==========
+
+    /// <summary>
+    /// A loja dona deste produto
+    /// </summary>
+    public Store Store { get; set; } = null!;
+
+    /// <summary>
+    /// Categoria do produto
+    /// </summary>
+    public Category? Category { get; set; }
+
+    /// <summary>
+    /// Avaliações deste produto
+    /// </summary>
+    public ICollection<ReviewProduct> ReviewsProduct { get; set; } = new List<ReviewProduct>();  
+
+    /// <summary>
+    /// Itens de pedido que contêm este produto
+    /// </summary>
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    /// <summary>
+    /// Itens de carrinho que contêm este produto
+    /// </summary>
+    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     // ========== PROPRIEDADES CALCULADAS ==========
-    // Não vão para o banco de dados, são calculadas em tempo real
-    
-    /// <summary>
-    /// Avaliação média do produto (0 a 5)
-    /// Calcula automaticamente baseado nas ReviewProduct
-    /// [NotMapped] significa que não cria coluna no banco
-    /// </summary>
+
     [NotMapped]
     public double AverageRating
     {
         get
         {
-            if (ReviewProduct == null || ReviewProduct.Count == 0)
-                return 0; // FAZER ALTERAÇÃO NA LÓGICA
+            if (ReviewsProduct == null || !ReviewsProduct.Any())
+                return 0;
             
-            return Math.Round(ReviewProduct.Average(r => r.Rating), 1);
+            return Math.Round(ReviewsProduct.Average(r => r.Rating), 1);
         }
     }
 
-
-
-    // <summary>
-    /// Total de avaliações recebidas
-    /// </summary>
     [NotMapped]
-    public int TotalReviewProduct => ReviewProduct?.Count ?? 0;
+    public int TotalReviews => ReviewsProduct?.Count ?? 0;
 
+    [NotMapped]
+    public bool IsAvailable => Status == ProductStatus.Available && Stock > 0;
 }
 
 /// <summary>
-/// Enum para status de produto
+/// Status possíveis de um produto
 /// </summary>
-public enum StoreStatus
+public enum ProductStatus
 {
-    Active = 1,      // Loja ativa e funcionando
-    Inactive = 2,    // Desativada temporariamente pelo vendedor
-    Suspended = 3    // Suspensa por violação de políticas (ação do admin)
+    Available = 1,      // Disponível para venda
+    OutOfStock = 2,     // Sem estoque
+    Discontinued = 3,   // Descontinuado
+    Draft = 4          // Rascunho (ainda não publicado)
 }

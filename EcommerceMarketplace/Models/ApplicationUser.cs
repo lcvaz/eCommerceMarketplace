@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace EcommerceMarketplace.Models;
@@ -18,9 +19,9 @@ public class ApplicationUser : IdentityUser
     /// essa sintaxe é para inicializar o campo com a data e hora atual 
     /// sem o set na propriedade o valor será sempre a data e hora atual e não será alterado
     /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; 
-    
-    
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+
     public string FullName { get; set; } = string.Empty;
 
 
@@ -28,6 +29,8 @@ public class ApplicationUser : IdentityUser
     /// CPF do usuário (específico do Brasil)
     /// O ? torna nullable - nem todo usuário precisa ter CPF
     /// </summary>
+    [StringLength(14)]  // 000.000.000-00
+    [RegularExpression(@"^\d{3}\.\d{3}\.\d{3}-\d{2}$")]
     public string? CPF { get; set; }
 
     // ========== RELACIONAMENTOS ==========
