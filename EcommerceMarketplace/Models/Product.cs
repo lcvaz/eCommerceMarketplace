@@ -89,7 +89,7 @@ public class Product
     /// <summary>
     /// Itens de carrinho que contêm este produto
     /// </summary>
-    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+    public ICollection<Cart> Cart { get; set; } = new List<Cart>();
 
     // ========== PROPRIEDADES CALCULADAS ==========
 

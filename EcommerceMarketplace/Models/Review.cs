@@ -1,1 +1,7 @@
-namespace EcommerceMarketplace.Models
+namespace EcommerceMarketplace.Models;
+
+public class Review 
+{
+
+    
+}
