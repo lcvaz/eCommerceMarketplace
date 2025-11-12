@@ -81,4 +81,9 @@ public class ReviewProduct
 
     public ApplicationUser Customer { get; set; } = null!;
     public Product Product { get; set; } = null!;
+    /// <summary>
+    /// Fotos enviadas pelo cliente nesta review
+    /// Limite: máximo 5 fotos por review
+    /// </summary>
+    public ICollection<ReviewProductImage> Images { get; set; } = new List<ReviewProductImage>();
 }
