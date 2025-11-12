@@ -47,7 +47,8 @@ public class ApplicationUser : IdentityUser
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
 
     // O cliente terá avaliações feitas
-    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<ReviewProduct> ReviewsProduct { get; set; } = new List<ReviewProduct>();
+    public ICollection<ReviewStore> ReviewsStore { get; set; } = new List<ReviewStore>();
         
     // O cliente terá carrinho , porém não obrigatoriamente 
     public Cart? Cart { get; set; }

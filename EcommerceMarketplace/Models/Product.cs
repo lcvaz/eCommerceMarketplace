@@ -8,7 +8,6 @@ namespace EcommerceMarketplace.Models;
 /// </summary> 
 public class Product
 {
-    [Required(ErrorMessage = "O ID do produto é obrigatório")]
     public int Id { get; set; }
 
     [Required(ErrorMessage = "O nome do produto é obrigatório")]
@@ -35,13 +34,15 @@ public class Product
     /// SKU - Código único do produto
     /// </summary>
     [StringLength(50)]
-    public string SKU { get; set; }
+    [Required(ErrorMessage = "O SKU é obrigatório")]
+    public string SKU { get; set; } = string.Empty;
 
     /// <summary>
     /// URL da imagem principal do produto
     /// </summary>
     [Url(ErrorMessage = "URL inválida")]
-    public string ImageUrl { get; set; }
+    [Required(ErrorMessage = "A imagem do produto é obrigatória")]
+    public string ImageUrl { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
@@ -84,12 +85,12 @@ public class Product
     /// <summary>
     /// Itens de pedido que contêm este produto
     /// </summary>
-    public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
 
     /// <summary>
     /// Itens de carrinho que contêm este produto
     /// </summary>
-    public ICollection<Cart> Cart { get; set; } = new List<Cart>();
+    public ICollection<CartItem> CartItem { get; set; } = new List<CartItem>();
 
     // ========== PROPRIEDADES CALCULADAS ==========
 

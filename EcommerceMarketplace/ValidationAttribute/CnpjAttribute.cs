@@ -1,6 +1,8 @@
 using Caelum.Stella.CSharp.Validation;
 using System.ComponentModel.DataAnnotations;
 
+namespace EcommerceMarketplace.ValidationAttributes;
+
 public class CnpjAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
