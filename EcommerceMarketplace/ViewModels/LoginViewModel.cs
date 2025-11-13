@@ -3,16 +3,10 @@ using System.ComponentModel.DataAnnotations;
 namespace EcommerceMarketplace.ViewModels;
 
 ///<summary>
-/// Esta classe é um DTO
+/// Esta classe é um DTO para login
 ///</summary>
-public class RegisterViewModel 
+public class LoginViewModel 
 {
-    [Display(Name = "Nome Completo")]
-    [Required(ErrorMessage = "O nome não pode ser nulo.")]
-    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome deve ter entre 3 e 200 caracteres")]
-    public string FullName { get; set;} = string.Empty;
-
-
     [Display(Name = "Email")]
     [Required(ErrorMessage = "O Email não pode ser nulo.")]
     [EmailAddress(ErrorMessage = "Revise o formato do Email")]
@@ -32,9 +26,6 @@ public class RegisterViewModel
     public string Password { get; set;} = string.Empty;
 
 
-    [Display(Name = "Confirmação de senha")]
-    [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "As senhas não coincidem")]
-    [Required(ErrorMessage = "Confirme sua senha.")]
-    public string ConfirmPassword { get; set;} = string.Empty;
+    [Display(Name = "Lembrar-me")]
+    public bool RememberMe { get; set; } = false;
 }
