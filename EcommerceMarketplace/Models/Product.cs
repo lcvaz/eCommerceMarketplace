@@ -85,12 +85,12 @@ public class Product
     /// <summary>
     /// Itens de pedido que contêm este produto
     /// </summary>
-    public ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     /// <summary>
     /// Itens de carrinho que contêm este produto
     /// </summary>
-    public ICollection<CartItem> CartItem { get; set; } = new List<CartItem>();
+    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     // ========== PROPRIEDADES CALCULADAS ==========
 

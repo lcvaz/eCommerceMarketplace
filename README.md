@@ -61,3 +61,26 @@ SELECT * FROM Orders WHERE OrderNumber = 'PED-2025-001234';
 -- 1. Olha no índice: OrderNumber 'PED-2025-001234' → Linha 1234
 -- 2. Vai DIRETO na linha 1234
 -- Tempo: 0.01 segundos! ⚡
+
+### 🔍 Entendendo a Connection String
+```
+Server=.;
+   ↑
+   Servidor local (. = localhost)
+
+Database=EcommerceMarketplaceDB;
+   ↑
+   Nome do banco de dados que será criado
+
+Trusted_Connection=True;
+   ↑
+   Usar autenticação do Windows (sem usuário/senha)
+
+MultipleActiveResultSets=True;
+   ↑
+   Permite múltiplas queries simultâneas
+
+TrustServerCertificate=True
+   ↑
+   Confia no certificado do SQL Server (necessário para localhost)
+```   
