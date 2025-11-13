@@ -5,6 +5,18 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.11
 dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 8.0.11
 dotnet add package Microsoft.AspNetCore.Identity.UI --version 8.0.11
 dotnet add package Caelum.Stella.CSharp
+
+```
+dotnet ef migrations add InitialCreate 
+
+**O que vai acontecer:**
+- EF Core analisa todas as suas classes
+- Analisa o ApplicationDbContext
+- Gera código C# que representa as tabelas
+- Cria uma pasta `Migrations/` com os arquivos
+
+
+```
 ```
 
 ### ASP.NET Core Identity:
