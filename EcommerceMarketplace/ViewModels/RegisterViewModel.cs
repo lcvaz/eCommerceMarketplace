@@ -7,5 +7,10 @@ namespace EcommerceMarketplace.ViewModels;
 ///</summary>
 public class RegisterViewModel 
 {
-    public string Nome { get; set;} = string.Empty;
+    [Required]
+    public string FullName { get; set;} = string.Empty;
+    public string Email { get; set;} = string.Empty;
+    public string CPF { get; set;} = string.Empty;
+    public string Password { get; set;} = string.Empty;
+    public string ConfirmPassword { get; set;} = string.Empty;
 }
