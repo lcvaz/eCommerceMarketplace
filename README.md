@@ -5,6 +5,7 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.11
 dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 8.0.11
 dotnet add package Microsoft.AspNetCore.Identity.UI --version 8.0.11
 dotnet add package Caelum.Stella.CSharp
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 
 ```
 dotnet ef migrations add InitialCreate 

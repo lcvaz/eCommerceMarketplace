@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ========== CONFIGURAÇÃO DO BANCO DE DADOS ==========
 
-// Adiciona o DbContext com SQL Server
+// Adiciona o DbContext com PostgreSQL/Supabase
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ========== CONFIGURAÇÃO DO IDENTITY ==========
