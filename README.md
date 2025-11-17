@@ -95,4 +95,15 @@ MultipleActiveResultSets=True;
 TrustServerCertificate=True
    ↑
    Confia no certificado do SQL Server (necessário para localhost)
-```   
+   
+```
+
+
+### O Que É Um Controller?
+```
+Um Controller é uma classe que:
+
+Recebe requisições HTTP (GET, POST, PUT, DELETE)
+Processa a lógica de negócio
+Retorna uma resposta (View, JSON, Redirect)
+```

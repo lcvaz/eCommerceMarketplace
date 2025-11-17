@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using EcommerceMarketplace.Enums;
+
 
 namespace EcommerceMarketplace.ViewModels;
 
@@ -37,4 +39,9 @@ public class RegisterViewModel
     [Compare("Password", ErrorMessage = "As senhas não coincidem")]
     [Required(ErrorMessage = "Confirme sua senha.")]
     public string ConfirmPassword { get; set;} = string.Empty;
+
+
+    [Display(Name = "Tipo de Conta")]
+    [Required(ErrorMessage = "Selecione o tipo de conta")]
+    public AccountType AccountType { get; set; } = AccountType.Cliente;
 }

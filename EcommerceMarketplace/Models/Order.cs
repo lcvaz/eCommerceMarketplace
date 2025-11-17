@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceMarketplace.Enums;
 
 namespace EcommerceMarketplace.Models;
 
@@ -130,16 +131,4 @@ public class Order
     public bool IsCanceled => CanceledAt.HasValue;
 }
 
-/// <summary>
-/// Status possíveis de um pedido
-/// </summary>
-public enum OrderStatus
-{
-    Pending = 1,           // Pendente (aguardando pagamento)
-    PaymentConfirmed = 2,  // Pagamento confirmado
-    Processing = 3,        // Em processamento (separando produtos)
-    Shipped = 4,           // Enviado
-    Delivered = 5,         // Entregue
-    Canceled = 6,          // Cancelado
-    Returned = 7           // Devolvido
-}
+
