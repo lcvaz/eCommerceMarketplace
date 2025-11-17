@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceMarketplace.Enums;
 
 namespace EcommerceMarketplace.Models;
 
@@ -113,13 +114,4 @@ public class Product
     public bool IsAvailable => Status == ProductStatus.Available && Stock > 0;
 }
 
-/// <summary>
-/// Status possíveis de um produto
-/// </summary>
-public enum ProductStatus
-{
-    Available = 1,      // Disponível para venda
-    OutOfStock = 2,     // Sem estoque
-    Discontinued = 3,   // Descontinuado
-    Draft = 4          // Rascunho (ainda não publicado)
-}
+

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceMarketplace.Enums; 
 
 namespace EcommerceMarketplace.Models;
 
@@ -56,9 +57,3 @@ public class Store
     public int TotalReviews => ReviewsStore?.Count ?? 0;  
 }
 
-public enum StoreStatus
-{
-    Active = 1,
-    Inactive = 2,
-    Suspended = 3
-}
