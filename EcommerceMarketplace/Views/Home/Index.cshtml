@@ -5,28 +5,33 @@
 }
 
 <!-- Hero Section -->
-<section class="bg-light py-5">
-    <div class="container">
+<section class="hero-section">
+    <!-- Imagem com Gradient -->
+    <div class="hero-image-container">
+        <img src="~/images/hero-ecommerce.jpg" 
+             alt="E-commerce Shopping" 
+             class="hero-image">
+    </div>
+    
+    <!-- Conteúdo do Hero -->
+    <div class="container hero-content">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Bem-vindo ao EcommerceMarketplace</h1>
-                <p class="lead mb-4">
+            <div class="col-lg-7">
+                <h1 class="display-3 fw-bold mb-4">
+                    Bem-vindo ao<br>EcommerceMarketplace
+                </h1>
+                <p class="lead mb-4" style="font-size: 1.25rem;">
                     Descubra nossa seleção cuidadosa de produtos artesanais e exclusivos.
                     Conectamos vendedores talentosos com clientes que buscam qualidade.
                 </p>
-                <div class="d-flex gap-3">
-                    <a href="#produtos" class="btn btn-primary btn-lg">
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="#produtos" class="btn btn-light btn-lg shadow">
                         <i class="bi bi-shop"></i> Ver Produtos
                     </a>
-                    <a href="#categorias" class="btn btn-outline-primary btn-lg">
+                    <a href="#categorias" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-grid"></i> Categorias
                     </a>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <img src="https://via.placeholder.com/600x400/007bff/ffffff?text=Marketplace" 
-                     class="img-fluid rounded shadow" 
-                     alt="Marketplace">
             </div>
         </div>
     </div>
