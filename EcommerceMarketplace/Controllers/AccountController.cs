@@ -96,36 +96,52 @@ public class AccountController : Controller // Importa Controller de Mvc
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        // 1. Valida o modelo
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        // 2. Tenta fazer login
         var result = await _signInManager.PasswordSignInAsync(
-            model.Email,              // Email do usuário
-            model.Password,           // Senha
-            model.RememberMe,         // Lembrar-me (cookie persistente)
-            lockoutOnFailure: true    // Bloqueia após 5 tentativas erradas
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: true
         );
 
-        // 3. Verifica o resultado
         if (result.Succeeded)
         {
-            // Login bem-sucedido!
+            // Buscar o usuário para verificar a role
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            
+            if (user != null)
+            {
+                // Verificar se é Admin
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction("Index", "Admin");  // Dashboard Admin
+                }
+                
+                // Verificar se é Vendedor
+                if (await _userManager.IsInRoleAsync(user, "Vendedor"))
+                {
+                    return RedirectToAction("Dashboard", "Vendor");  // Dashboard Vendedor
+                }
+                
+                // Se não é Admin nem Vendedor, é Cliente
+                return RedirectToAction("Index", "Home");  // Home/Dashboard Cliente
+            }
+            
+            // Fallback: se não encontrou usuário (improvável)
             return RedirectToAction("Index", "Home");
         }
 
         if (result.IsLockedOut)
         {
-            // Conta bloqueada (muitas tentativas erradas)
             ModelState.AddModelError(string.Empty, 
-                "Conta bloqueada por excesso de tentativas. Tente novamente em 5 minutos."); // Conta bloqueada por 5 minutos (configuramos no Program.cs)
+                "Conta bloqueada por excesso de tentativas. Tente novamente em 5 minutos.");
             return View(model);
         }
 
-        // 4. Login falhou (email ou senha incorretos)
         ModelState.AddModelError(string.Empty, "Email ou senha incorretos.");
         return View(model);
     }
