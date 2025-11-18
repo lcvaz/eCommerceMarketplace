@@ -1,8 +1,134 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Bem-vindo ao EcommerceMarketplace</h1>
+                <p class="lead mb-4">
+                    Descubra nossa seleção cuidadosa de produtos artesanais e exclusivos.
+                    Conectamos vendedores talentosos com clientes que buscam qualidade.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#produtos" class="btn btn-primary btn-lg">
+                        <i class="bi bi-shop"></i> Ver Produtos
+                    </a>
+                    <a href="#categorias" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-grid"></i> Categorias
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://via.placeholder.com/600x400/007bff/ffffff?text=Marketplace" 
+                     class="img-fluid rounded shadow" 
+                     alt="Marketplace">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção: Comprar por Categoria -->
+<section id="categorias" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Comprar por Categoria</h2>
+            <p class="lead text-muted">Explore nossas coleções especiais</p>
+        </div>
+
+        @if (Model.FeaturedCategories.Any())
+        {
+            <div class="row g-4">
+                @foreach (var category in Model.FeaturedCategories)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm hover-shadow">
+                            <div class="card-img-top bg-light" style="height: 200px; overflow: hidden;">
+                                <img src="@(category.IconUrl ?? "https://via.placeholder.com/300x200/6c757d/ffffff?text=" + category.Name)" 
+                                     class="w-100 h-100 object-fit-cover" 
+                                     alt="@category.Name">
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold">@category.Name</h5>
+                                <p class="card-text text-muted small">@category.Description</p>
+                                <a href="#" class="btn btn-outline-dark">
+                                    Ver tudo <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> 
+                Nenhuma categoria disponível no momento.
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Seção: Produtos em Destaque -->
+<section id="produtos" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Produtos em Destaque</h2>
+            <p class="lead text-muted">Selecionados especialmente para você</p>
+        </div>
+
+        @if (Model.FeaturedProducts.Any())
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.FeaturedProducts)
+                {
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="card h-100 shadow-sm hover-shadow">
+                            <div class="card-img-top bg-white" style="height: 250px; overflow: hidden;">
+                                <img src="@product.ImageUrl" 
+                                     class="w-100 h-100 object-fit-cover" 
+                                     alt="@product.Name"
+                                     onerror="this.src='https://via.placeholder.com/300x250/6c757d/ffffff?text=Produto'">
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <small class="text-muted text-uppercase">@product.Category?.Name</small>
+                                <h5 class="card-title fw-bold mb-2">@product.Name</h5>
+                                <p class="card-text text-muted small mb-3">
+                                    @(product.Description?.Length > 60 
+                                        ? product.Description.Substring(0, 60) + "..." 
+                                        : product.Description)
+                                </p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 class="mb-0 text-primary fw-bold">
+                                            @product.Price.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                        </h4>
+                                        <small class="text-muted">por @product.Store.Name</small>
+                                    </div>
+                                    <button class="btn btn-dark w-100">
+                                        <i class="bi bi-cart-plus"></i> Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> 
+                Nenhum produto disponível no momento.
+            </div>
+        }
+    </div>
+</section>
+
+
+

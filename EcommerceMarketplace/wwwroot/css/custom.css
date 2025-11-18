@@ -1,0 +1,131 @@
+/* ========================================
+   NAVBAR FIXA
+   ======================================== */
+
+   .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.sticky-top .navbar {
+    margin-bottom: 0 !important;
+}
+
+/* ========================================
+   CARDS E HOVER EFFECTS
+   ======================================== */
+
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* ========================================
+   BOTÕES CUSTOMIZADOS
+   ======================================== */
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 0;
+}
+
+.hero-section h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ========================================
+   CATEGORIAS
+   ======================================== */
+
+.category-card {
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    border-color: #007bff !important;
+}
+
+/* ========================================
+   PRODUTOS
+   ======================================== */
+
+.product-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-image {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 40px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .product-image {
+        height: 200px;
+    }
+}
+
+/* ========================================
+   SCROLLBAR CUSTOMIZADA (opcional)
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
