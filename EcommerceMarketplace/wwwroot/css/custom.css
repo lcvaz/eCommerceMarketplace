@@ -1,0 +1,224 @@
+/* ========================================
+   NAVBAR FIXA
+   ======================================== */
+
+   .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.sticky-top .navbar {
+    margin-bottom: 0 !important;
+}
+
+/* ========================================
+   CARDS E HOVER EFFECTS
+   ======================================== */
+
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* ========================================
+   BOTÕES CUSTOMIZADOS
+   ======================================== */
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 0;
+}
+
+.hero-section h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ========================================
+   CATEGORIAS
+   ======================================== */
+
+.category-card {
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    border-color: #007bff !important;
+}
+
+/* ========================================
+   PRODUTOS
+   ======================================== */
+
+.product-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-image {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 40px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .product-image {
+        height: 200px;
+    }
+}
+
+/* ========================================
+   SCROLLBAR CUSTOMIZADA (opcional)
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* ========================================
+   HERO SECTION - FULL WIDTH COM GRADIENT LONGO
+   ======================================== */
+
+   .hero-section {
+    position: relative;
+    min-height: 500px;
+    color: white;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    padding: 80px 0;
+}
+
+.hero-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;  /* 100% da largura */
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;  /* Imagem alinhada à direita */
+}
+
+/* Gradient Overlay - Mais Longo e Suave */
+.hero-image-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to right, 
+        rgba(102, 126, 234, 1) 0%,      /* Roxo sólido à esquerda */
+        rgba(102, 126, 234, 0.95) 15%,  /* Quase sólido */
+        rgba(102, 126, 234, 0.85) 30%,  /* Bem opaco */
+        rgba(102, 126, 234, 0.65) 45%,  /* Médio */
+        rgba(102, 126, 234, 0.40) 60%,  /* Começando a clarear */
+        rgba(102, 126, 234, 0.20) 75%,  /* Bem transparente */
+        rgba(102, 126, 234, 0) 90%      /* Totalmente transparente */
+    );
+    z-index: 2;
+}
+
+/* Text Shadow para legibilidade */
+.hero-section h1 {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section .lead {
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .hero-image-container::after {
+        background: linear-gradient(
+            to right, 
+            rgba(102, 126, 234, 1) 0%,
+            rgba(102, 126, 234, 0.9) 20%,
+            rgba(102, 126, 234, 0.7) 40%,
+            rgba(102, 126, 234, 0.4) 60%,
+            rgba(102, 126, 234, 0) 80%
+        );
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 400px;
+    }
+    
+    .hero-image-container::after {
+        background: rgba(102, 126, 234, 0.8);  /* Overlay sólido em mobile */
+    }
+    
+    .hero-content {
+        padding: 40px 0;
+    }
+}
