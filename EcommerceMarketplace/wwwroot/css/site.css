@@ -72,7 +72,7 @@ body {
 /* ===== Social Sidebar ===== */
 .social-sidebar {
   position: fixed;
-  left: 20px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -119,7 +119,7 @@ body {
   position: relative;
   height: 90vh;
   min-height: 600px;
-  background-image: url('../images/hero-ecommerce.jpg');
+  background-image: url('/images/hero-ecommerce.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -243,6 +243,7 @@ body {
 .products-section {
   padding: 5rem 0;
   background-color: white;
+  margin-bottom: 2rem;
 }
 
 .section-title {
