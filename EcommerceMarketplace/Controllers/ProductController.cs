@@ -85,7 +85,7 @@ public class ProductController : Controller
                 .ThenInclude(s => s.Vendor)
             .Include(p => p.Category)
             .Include(p => p.ReviewsProduct)
-                .ThenInclude(r => r.User)
+                .ThenInclude(r => r.Customer)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)

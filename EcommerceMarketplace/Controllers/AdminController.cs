@@ -41,8 +41,8 @@ public class AdminController : Controller
         var totalProducts = await _context.Products.CountAsync();
         var totalOrders = await _context.Orders.CountAsync();
         var totalRevenue = await _context.Orders
-            .Where(o => o.Status == EcommerceMarketplace.Enums.OrderStatus.Entregue)
-            .SumAsync(o => o.Total);
+            .Where(o => o.Status == EcommerceMarketplace.Enums.OrderStatus.Delivered)
+            .SumAsync(o => o.TotalAmount);
 
         // Usuários por role
         var admins = await _userManager.GetUsersInRoleAsync("Admin");
@@ -51,7 +51,7 @@ public class AdminController : Controller
 
         // Pedidos recentes
         var recentOrders = await _context.Orders
-            .Include(o => o.User)
+            .Include(o => o.Customer)
             .OrderByDescending(o => o.CreatedAt)
             .Take(10)
             .ToListAsync();
@@ -104,8 +104,8 @@ public class AdminController : Controller
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        var stores = await _context.Stores.Where(s => s.UserId == id).ToListAsync();
-        var orders = await _context.Orders.Where(o => o.UserId == id).ToListAsync();
+        var stores = await _context.Stores.Where(s => s.VendorId == id).ToListAsync();
+        var orders = await _context.Orders.Where(o => o.CustomerId == id).ToListAsync();
 
         ViewBag.Roles = roles;
         ViewBag.Stores = stores;
@@ -182,7 +182,7 @@ public class AdminController : Controller
     public async Task<IActionResult> Stores()
     {
         var stores = await _context.Stores
-            .Include(s => s.User)
+            .Include(s => s.Vendor)
             .Include(s => s.Products)
             .ToListAsync();
 
@@ -196,7 +196,7 @@ public class AdminController : Controller
     public async Task<IActionResult> StoreDetails(int id)
     {
         var store = await _context.Stores
-            .Include(s => s.User)
+            .Include(s => s.Vendor)
             .Include(s => s.Products)
             .FirstOrDefaultAsync(s => s.Id == id);
 
@@ -222,10 +222,12 @@ public class AdminController : Controller
             return NotFound();
         }
 
-        store.IsActive = !store.IsActive;
+        store.Status = store.Status == EcommerceMarketplace.Enums.StoreStatus.Active
+            ? EcommerceMarketplace.Enums.StoreStatus.Inactive
+            : EcommerceMarketplace.Enums.StoreStatus.Active;
         await _context.SaveChangesAsync();
 
-        var status = store.IsActive ? "ativada" : "desativada";
+        var status = store.Status == EcommerceMarketplace.Enums.StoreStatus.Active ? "ativada" : "desativada";
         TempData["Success"] = $"Loja {store.Name} foi {status}.";
 
         return RedirectToAction(nameof(Stores));
@@ -285,10 +287,12 @@ public class AdminController : Controller
             return NotFound();
         }
 
-        product.IsActive = !product.IsActive;
+        product.Status = product.Status == EcommerceMarketplace.Enums.ProductStatus.Available
+            ? EcommerceMarketplace.Enums.ProductStatus.Unavailable
+            : EcommerceMarketplace.Enums.ProductStatus.Available;
         await _context.SaveChangesAsync();
 
-        var status = product.IsActive ? "ativado" : "desativado";
+        var status = product.Status == EcommerceMarketplace.Enums.ProductStatus.Available ? "ativado" : "desativado";
         TempData["Success"] = $"Produto {product.Name} foi {status}.";
 
         return RedirectToAction(nameof(Products));

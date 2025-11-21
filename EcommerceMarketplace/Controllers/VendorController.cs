@@ -329,7 +329,7 @@ public class VendorController : Controller
 
         // Recarregar dados para o formulário
         var stores = await _context.Stores
-            .Where(s => s.VendorId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.Status == EcommerceMarketplace.Enums.StoreStatus.Active)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
@@ -363,7 +363,7 @@ public class VendorController : Controller
 
         // Buscar lojas e categorias
         var stores = await _context.Stores
-            .Where(s => s.VendorId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.Status == EcommerceMarketplace.Enums.StoreStatus.Active)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
@@ -431,7 +431,7 @@ public class VendorController : Controller
 
         // Recarregar dados
         var stores = await _context.Stores
-            .Where(s => s.VendorId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.Status == EcommerceMarketplace.Enums.StoreStatus.Active)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
