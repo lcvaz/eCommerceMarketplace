@@ -1,0 +1,176 @@
+@model IEnumerable<EcommerceMarketplace.Models.Product>
+@{
+    ViewData["Title"] = "Catálogo de Produtos";
+    var categories = ViewBag.Categories as List<EcommerceMarketplace.Models.Category>;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Filtros Laterais -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filtros</h5>
+
+                    <form asp-action="Index" method="get">
+                        <!-- Busca -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Buscar</label>
+                            <input type="text" name="search" class="form-control"
+                                   value="@ViewBag.CurrentSearch" placeholder="Nome do produto...">
+                        </div>
+
+                        <!-- Categorias -->
+                        @if (categories != null && categories.Any())
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Categoria</label>
+                                <select name="category" class="form-select">
+                                    <option value="">Todas as categorias</option>
+                                    @foreach (var cat in categories)
+                                    {
+                                        <option value="@cat.Name"
+                                                selected="@(ViewBag.CurrentCategory == cat.Name)">
+                                            @cat.Name
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        }
+
+                        <!-- Preço -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Faixa de Preço</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" name="minPrice" class="form-control form-control-sm"
+                                           value="@ViewBag.MinPrice" placeholder="Mín" step="0.01">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="maxPrice" class="form-control form-control-sm"
+                                           value="@ViewBag.MaxPrice" placeholder="Máx" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100">
+                            <i class="bi bi-funnel"></i> Filtrar
+                        </button>
+
+                        @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) ||
+                             !string.IsNullOrEmpty(ViewBag.CurrentCategory) ||
+                             ViewBag.MinPrice != null ||
+                             ViewBag.MaxPrice != null)
+                        {
+                            <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">
+                                Limpar Filtros
+                            </a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Produtos -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Produtos</h2>
+                <span class="text-muted">@Model.Count() produtos encontrados</span>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var product in Model)
+                    {
+                        <div class="col-sm-6 col-md-4 col-xl-3">
+                            <div class="card h-100 product-card-hover border-0 shadow-sm">
+                                <a asp-action="Details" asp-route-id="@product.Id" class="text-decoration-none text-dark">
+                                    <div class="product-image-container">
+                                        <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
+                                    </div>
+                                    <div class="card-body d-flex flex-column">
+                                        <small class="text-muted text-uppercase mb-1">
+                                            @(product.Category?.Name ?? "Geral")
+                                        </small>
+                                        <h6 class="card-title fw-bold mb-2">@product.Name</h6>
+                                        <p class="card-text text-muted small mb-2">
+                                            @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 60)
+                                            {
+                                                @product.Description.Substring(0, 60)<text>...</text>
+                                            }
+                                            else
+                                            {
+                                                @product.Description
+                                            }
+                                        </p>
+
+                                        <!-- Avaliação -->
+                                        @if (product.TotalReviews > 0)
+                                        {
+                                            <div class="mb-2">
+                                                <small>
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        if (i <= product.AverageRating)
+                                                        {
+                                                            <i class="bi bi-star-fill text-warning"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-star text-warning"></i>
+                                                        }
+                                                    }
+                                                    <span class="text-muted">(@product.TotalReviews)</span>
+                                                </small>
+                                            </div>
+                                        }
+
+                                        <div class="mt-auto">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="h5 mb-0 fw-bold text-dark">R$ @product.Price.ToString("N2")</span>
+                                                <span class="badge bg-success">Disponível</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Nenhum produto encontrado com os filtros aplicados.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.product-card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.product-image-container {
+    height: 200px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+</style>

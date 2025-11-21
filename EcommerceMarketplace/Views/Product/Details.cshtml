@@ -1,0 +1,282 @@
+@model EcommerceMarketplace.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+    var relatedProducts = ViewBag.RelatedProducts as List<EcommerceMarketplace.Models.Product>;
+    var storeRating = ViewBag.StoreAverageRating as double?;
+    var storeTotalReviews = ViewBag.StoreTotalReviews as int?;
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Botão Voltar -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="javascript:history.back()" class="btn btn-link text-decoration-none text-dark p-0">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Produto Principal -->
+    <div class="row">
+        <!-- Galeria de Imagens -->
+        <div class="col-lg-6 mb-4">
+            <div class="product-gallery">
+                <div class="main-image-container">
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" id="mainProductImage">
+                    <!-- Navegação da galeria -->
+                    <button class="gallery-nav prev" onclick="previousImage()">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="gallery-nav next" onclick="nextImage()">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- Thumbnails (por enquanto só uma imagem) -->
+                <div class="thumbnails mt-3">
+                    <img src="@Model.ImageUrl" alt="Thumbnail" class="thumbnail-image active" onclick="changeMainImage('@Model.ImageUrl')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Produto -->
+        <div class="col-lg-6">
+            <!-- Breadcrumb/Categoria -->
+            <div class="text-muted mb-2">
+                <small>@(Model.Category?.Name ?? "Produtos")</small>
+            </div>
+
+            <!-- Nome do Produto -->
+            <h1 class="h2 fw-bold mb-3">@Model.Name</h1>
+
+            <!-- Avaliações -->
+            <div class="d-flex align-items-center mb-3">
+                <div class="star-rating me-2">
+                    @{
+                        var rating = Model.AverageRating;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= rating)
+                            {
+                                <i class="bi bi-star-fill text-warning"></i>
+                            }
+                            else if (i - 0.5 <= rating)
+                            {
+                                <i class="bi bi-star-half text-warning"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star text-warning"></i>
+                            }
+                        }
+                    }
+                </div>
+                <span class="fw-bold me-2">@rating.ToString("N1")</span>
+                <span class="text-muted">(@Model.TotalReviews avaliações)</span>
+            </div>
+
+            <!-- Preço -->
+            <div class="mb-3">
+                <h2 class="h3 fw-bold mb-1">R$ @Model.Price.ToString("N2")</h2>
+                <p class="text-muted">ou 12x de R$ @((Model.Price / 12).ToString("N2")) sem juros</p>
+            </div>
+
+            <!-- Badge Frete Grátis -->
+            <div class="alert alert-success d-inline-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-truck me-2"></i>
+                <span>Frete grátis para todo Brasil</span>
+            </div>
+
+            <!-- Informações do Vendedor -->
+            <div class="vendor-info p-3 border rounded mb-4">
+                <h6 class="text-muted mb-2">Informações do vendedor</h6>
+                <h5 class="mb-2">
+                    <a href="#" class="text-decoration-none text-primary">@Model.Store.Name</a>
+                </h5>
+                <div class="reputation-bar">
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: @((storeRating ?? 0) * 20)%"
+                             aria-valuenow="@((storeRating ?? 0) * 20)" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-success">Excelente reputação</small>
+                </div>
+            </div>
+
+            <!-- Botão Adicionar ao Carrinho -->
+            <button class="btn btn-dark btn-lg w-100 mb-3" onclick="addToCart(@Model.Id)">
+                <i class="bi bi-cart-plus me-2"></i>
+                Adicionar ao carrinho
+            </button>
+
+            <!-- Estoque Disponível -->
+            <div class="text-center">
+                <small class="text-muted">
+                    <i class="bi bi-box-seam"></i> @Model.Stock unidades disponíveis
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Informações -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                            data-bs-target="#description" type="button" role="tab">
+                        Descrição
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="specifications-tab" data-bs-toggle="tab"
+                            data-bs-target="#specifications" type="button" role="tab">
+                        Características
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab"
+                            data-bs-target="#reviews" type="button" role="tab">
+                        Avaliações (@Model.TotalReviews)
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content p-4 border border-top-0 rounded-bottom" id="productTabsContent">
+                <!-- Descrição -->
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <p>@(Model.Description ?? "Sem descrição disponível.")</p>
+                </div>
+
+                <!-- Características -->
+                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th style="width: 200px;">SKU</th>
+                                <td>@Model.SKU</td>
+                            </tr>
+                            <tr>
+                                <th>Categoria</th>
+                                <td>@(Model.Category?.Name ?? "Sem categoria")</td>
+                            </tr>
+                            <tr>
+                                <th>Estoque</th>
+                                <td>@Model.Stock unidades</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    @if (Model.IsAvailable)
+                                    {
+                                        <span class="badge bg-success">Disponível</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Indisponível</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Avaliações -->
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <div class="star-rating d-inline-block">
+                                @{
+                                    for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= rating)
+                                        {
+                                            <i class="bi bi-star-fill text-warning fs-3"></i>
+                                        }
+                                        else if (i - 0.5 <= rating)
+                                        {
+                                            <i class="bi bi-star-half text-warning fs-3"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star text-warning fs-3"></i>
+                                        }
+                                    }
+                                }
+                            </div>
+                            <h3 class="mt-2">@rating.ToString("N1")</h3>
+                            <p class="text-muted">@Model.TotalReviews avaliações</p>
+                        </div>
+                        <p class="text-muted">As avaliações detalhadas dos clientes estarão disponíveis em breve.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Produtos Relacionados -->
+    @if (relatedProducts != null && relatedProducts.Any())
+    {
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">Produtos relacionados</h3>
+                <div class="row g-4">
+                    @foreach (var related in relatedProducts)
+                    {
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="product-image-wrapper">
+                                    <img src="@related.ImageUrl" class="card-img-top" alt="@related.Name">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <small class="text-muted text-uppercase mb-1">@(related.Category?.Name ?? "")</small>
+                                    <h6 class="card-title">@related.Name</h6>
+                                    <p class="card-text text-muted small flex-grow-1">
+                                        @(related.Description?.Length > 80 ? related.Description.Substring(0, 80) + "..." : related.Description)
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="h5 mb-0 fw-bold">R$ @related.Price.ToString("N2")</span>
+                                        <a asp-action="Details" asp-route-id="@related.Id" class="btn btn-sm btn-outline-dark">
+                                            Ver
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Função para adicionar ao carrinho (será implementada depois)
+        function addToCart(productId) {
+            alert('Funcionalidade de carrinho será implementada em breve!');
+            // TODO: Implementar chamada AJAX para adicionar ao carrinho
+        }
+
+        // Navegação de galeria (placeholder para múltiplas imagens futuras)
+        let currentImageIndex = 0;
+        const images = ['@Model.ImageUrl']; // Por enquanto só uma imagem
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            document.getElementById('mainProductImage').src = images[currentImageIndex];
+        }
+
+        function previousImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            document.getElementById('mainProductImage').src = images[currentImageIndex];
+        }
+
+        function changeMainImage(src) {
+            document.getElementById('mainProductImage').src = src;
+            // Atualizar thumbnail ativo
+            document.querySelectorAll('.thumbnail-image').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+}
