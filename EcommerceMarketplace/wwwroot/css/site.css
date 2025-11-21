@@ -366,3 +366,137 @@ body {
   border-top: 1px solid #dee2e6;
   margin-top: 4rem;
 }
+
+/* ===== Product Details Page ===== */
+.product-gallery {
+  position: relative;
+}
+
+.main-image-container {
+  position: relative;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.gallery-nav:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.gallery-nav.prev {
+  left: 10px;
+}
+
+.gallery-nav.next {
+  right: 10px;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 10px;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.thumbnail-image:hover,
+.thumbnail-image.active {
+  border-color: #000;
+}
+
+.star-rating i {
+  font-size: 1.2rem;
+}
+
+.vendor-info {
+  background-color: #f8f9fa;
+}
+
+.reputation-bar .progress {
+  border-radius: 4px;
+}
+
+.product-image-wrapper {
+  height: 200px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.nav-tabs .nav-link {
+  color: #666;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: #ddd;
+  color: #000;
+}
+
+.nav-tabs .nav-link.active {
+  color: #000;
+  border-bottom-color: #000;
+  background-color: transparent;
+}
+
+@media (max-width: 992px) {
+  .main-image-container {
+    aspect-ratio: 4/3;
+  }
+
+  .gallery-nav {
+    width: 35px;
+    height: 35px;
+  }
+
+  .thumbnail-image {
+    width: 60px;
+    height: 60px;
+  }
+}
