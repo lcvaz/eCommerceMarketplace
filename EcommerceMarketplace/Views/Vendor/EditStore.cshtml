@@ -1,0 +1,104 @@
+@model EcommerceMarketplace.Models.Store
+@{
+    ViewData["Title"] = "Editar Loja";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-pencil"></i> Editar Loja: @Model.Name
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditStore" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Nome da Loja -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">
+                                Nome da Loja <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Descrição</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="text-muted">Máximo 500 caracteres</small>
+                        </div>
+
+                        <!-- CNPJ -->
+                        <div class="mb-3">
+                            <label asp-for="CNPJ" class="form-label">CNPJ</label>
+                            <input asp-for="CNPJ" class="form-control" maxlength="18" />
+                            <span asp-validation-for="CNPJ" class="text-danger"></span>
+                            <small class="text-muted">Formato: 00.000.000/0000-00</small>
+                        </div>
+
+                        <!-- Logo URL -->
+                        <div class="mb-3">
+                            <label asp-for="LogoUrl" class="form-label">URL do Logo</label>
+                            <input asp-for="LogoUrl" class="form-control" />
+                            <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.LogoUrl" alt="Logo atual" class="img-thumbnail" style="max-height: 100px;">
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<EcommerceMarketplace.Enums.StoreStatus>()">
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <!-- Informações -->
+                        <div class="alert alert-light">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> Criado em: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="MyStores" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Máscara para CNPJ
+        document.querySelector('input[name="CNPJ"]')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 14) {
+                value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+                value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+    </script>
+}

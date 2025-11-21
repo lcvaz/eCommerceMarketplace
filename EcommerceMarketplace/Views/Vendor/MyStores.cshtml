@@ -37,13 +37,17 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-3">
                                 <h5 class="card-title">@store.Name</h5>
-                                @if (store.IsActive)
+                                @switch (store.Status)
                                 {
-                                    <span class="badge bg-success">Ativa</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inativa</span>
+                                    case EcommerceMarketplace.Enums.StoreStatus.Active:
+                                        <span class="badge bg-success">Ativa</span>
+                                        break;
+                                    case EcommerceMarketplace.Enums.StoreStatus.Inactive:
+                                        <span class="badge bg-danger">Inativa</span>
+                                        break;
+                                    case EcommerceMarketplace.Enums.StoreStatus.Suspended:
+                                        <span class="badge bg-warning">Suspensa</span>
+                                        break;
                                 }
                             </div>
                             <p class="card-text text-muted">@store.Description</p>

@@ -41,7 +41,7 @@ public class VendorController : Controller
 
         // Buscar estatísticas do vendedor
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id)
+            .Where(s => s.VendorId == user.Id)
             .Include(s => s.Products)
             .ToListAsync();
 
@@ -83,7 +83,7 @@ public class VendorController : Controller
         }
 
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id)
+            .Where(s => s.VendorId == user.Id)
             .Include(s => s.Products)
             .ToListAsync();
 
@@ -115,9 +115,9 @@ public class VendorController : Controller
 
         if (ModelState.IsValid)
         {
-            store.UserId = user.Id;
+            store.VendorId = user.Id;
             store.CreatedAt = DateTime.UtcNow;
-            store.IsActive = true;
+            store.Status = EcommerceMarketplace.Enums.StoreStatus.Active;
 
             _context.Stores.Add(store);
             await _context.SaveChangesAsync();
@@ -143,7 +143,7 @@ public class VendorController : Controller
         }
 
         var store = await _context.Stores
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == user.Id);
+            .FirstOrDefaultAsync(s => s.Id == id && s.VendorId == user.Id);
 
         if (store == null)
         {
@@ -173,7 +173,7 @@ public class VendorController : Controller
         }
 
         var existingStore = await _context.Stores
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == user.Id);
+            .FirstOrDefaultAsync(s => s.Id == id && s.VendorId == user.Id);
 
         if (existingStore == null)
         {
@@ -185,7 +185,8 @@ public class VendorController : Controller
             existingStore.Name = store.Name;
             existingStore.Description = store.Description;
             existingStore.CNPJ = store.CNPJ;
-            existingStore.IsActive = store.IsActive;
+            existingStore.LogoUrl = store.LogoUrl;
+            existingStore.Status = store.Status;
 
             await _context.SaveChangesAsync();
 
@@ -212,7 +213,7 @@ public class VendorController : Controller
 
         var store = await _context.Stores
             .Include(s => s.Products)
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == user.Id);
+            .FirstOrDefaultAsync(s => s.Id == id && s.VendorId == user.Id);
 
         if (store == null)
         {
@@ -251,7 +252,7 @@ public class VendorController : Controller
         var products = await _context.Products
             .Include(p => p.Store)
             .Include(p => p.Category)
-            .Where(p => p.Store.UserId == user.Id)
+            .Where(p => p.Store.VendorId == user.Id)
             .ToListAsync();
 
         return View(products);
@@ -272,7 +273,7 @@ public class VendorController : Controller
 
         // Buscar lojas do vendedor
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.Status == EcommerceMarketplace.Enums.StoreStatus.Active)
             .ToListAsync();
 
         if (!stores.Any())
@@ -306,7 +307,7 @@ public class VendorController : Controller
 
         // Verificar se a loja pertence ao vendedor
         var store = await _context.Stores
-            .FirstOrDefaultAsync(s => s.Id == product.StoreId && s.UserId == user.Id);
+            .FirstOrDefaultAsync(s => s.Id == product.StoreId && s.VendorId == user.Id);
 
         if (store == null)
         {
@@ -316,7 +317,8 @@ public class VendorController : Controller
         if (ModelState.IsValid)
         {
             product.CreatedAt = DateTime.UtcNow;
-            product.IsActive = true;
+            product.ModifiedAt = DateTime.UtcNow;
+            product.Status = EcommerceMarketplace.Enums.ProductStatus.Available;
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
@@ -327,7 +329,7 @@ public class VendorController : Controller
 
         // Recarregar dados para o formulário
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.IsActive)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
@@ -352,7 +354,7 @@ public class VendorController : Controller
 
         var product = await _context.Products
             .Include(p => p.Store)
-            .FirstOrDefaultAsync(p => p.Id == id && p.Store.UserId == user.Id);
+            .FirstOrDefaultAsync(p => p.Id == id && p.Store.VendorId == user.Id);
 
         if (product == null)
         {
@@ -361,7 +363,7 @@ public class VendorController : Controller
 
         // Buscar lojas e categorias
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.IsActive)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
@@ -392,7 +394,7 @@ public class VendorController : Controller
 
         var existingProduct = await _context.Products
             .Include(p => p.Store)
-            .FirstOrDefaultAsync(p => p.Id == id && p.Store.UserId == user.Id);
+            .FirstOrDefaultAsync(p => p.Id == id && p.Store.VendorId == user.Id);
 
         if (existingProduct == null)
         {
@@ -401,7 +403,7 @@ public class VendorController : Controller
 
         // Verificar se a loja pertence ao vendedor
         var store = await _context.Stores
-            .FirstOrDefaultAsync(s => s.Id == product.StoreId && s.UserId == user.Id);
+            .FirstOrDefaultAsync(s => s.Id == product.StoreId && s.VendorId == user.Id);
 
         if (store == null)
         {
@@ -411,13 +413,15 @@ public class VendorController : Controller
         if (ModelState.IsValid)
         {
             existingProduct.Name = product.Name;
+            existingProduct.SKU = product.SKU;
             existingProduct.Description = product.Description;
             existingProduct.Price = product.Price;
-            existingProduct.StockQuantity = product.StockQuantity;
+            existingProduct.Stock = product.Stock;
             existingProduct.ImageUrl = product.ImageUrl;
             existingProduct.CategoryId = product.CategoryId;
             existingProduct.StoreId = product.StoreId;
-            existingProduct.IsActive = product.IsActive;
+            existingProduct.Status = product.Status;
+            existingProduct.ModifiedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
@@ -427,7 +431,7 @@ public class VendorController : Controller
 
         // Recarregar dados
         var stores = await _context.Stores
-            .Where(s => s.UserId == user.Id && s.IsActive)
+            .Where(s => s.VendorId == user.Id && s.IsActive)
             .ToListAsync();
         var categories = await _context.Categories.ToListAsync();
 
@@ -453,7 +457,7 @@ public class VendorController : Controller
 
         var product = await _context.Products
             .Include(p => p.Store)
-            .FirstOrDefaultAsync(p => p.Id == id && p.Store.UserId == user.Id);
+            .FirstOrDefaultAsync(p => p.Id == id && p.Store.VendorId == user.Id);
 
         if (product == null)
         {

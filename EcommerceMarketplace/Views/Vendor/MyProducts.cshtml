@@ -40,17 +40,21 @@
                         <tr>
                             <td>@product.Name</td>
                             <td>@product.Store.Name</td>
-                            <td>@product.Category.Name</td>
+                            <td>@(product.Category?.Name ?? "Sem categoria")</td>
                             <td>R$ @product.Price.ToString("N2")</td>
-                            <td>@product.StockQuantity</td>
+                            <td>@product.Stock</td>
                             <td>
-                                @if (product.IsActive)
+                                @switch (product.Status)
                                 {
-                                    <span class="badge bg-success">Ativo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inativo</span>
+                                    case EcommerceMarketplace.Enums.ProductStatus.Available:
+                                        <span class="badge bg-success">Disponível</span>
+                                        break;
+                                    case EcommerceMarketplace.Enums.ProductStatus.OutOfStock:
+                                        <span class="badge bg-warning">Sem Estoque</span>
+                                        break;
+                                    case EcommerceMarketplace.Enums.ProductStatus.Discontinued:
+                                        <span class="badge bg-danger">Descontinuado</span>
+                                        break;
                                 }
                             </td>
                             <td>
