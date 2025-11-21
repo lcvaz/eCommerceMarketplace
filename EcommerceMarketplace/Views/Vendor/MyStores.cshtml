@@ -1,0 +1,76 @@
+@model IEnumerable<EcommerceMarketplace.Models.Store>
+@{
+    ViewData["Title"] = "Minhas Lojas";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Minhas Lojas</h1>
+        <a asp-action="CreateStore" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nova Loja
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var store in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="card-title">@store.Name</h5>
+                                @if (store.IsActive)
+                                {
+                                    <span class="badge bg-success">Ativa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inativa</span>
+                                }
+                            </div>
+                            <p class="card-text text-muted">@store.Description</p>
+                            <p class="text-muted mb-2"><small>CNPJ: @store.CNPJ</small></p>
+                            <p class="text-muted mb-3"><small>@store.Products.Count produtos</small></p>
+
+                            <div class="btn-group w-100">
+                                <a asp-action="EditStore" asp-route-id="@store.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form asp-action="DeleteStore" asp-route-id="@store.Id" method="post" class="d-inline" onsubmit="return confirm('Tem certeza?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Você ainda não tem lojas. <a asp-action="CreateStore">Crie sua primeira loja!</a>
+        </div>
+    }
+</div>

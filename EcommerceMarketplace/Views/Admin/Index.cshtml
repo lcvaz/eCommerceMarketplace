@@ -1,0 +1,142 @@
+@{
+    ViewData["Title"] = "Dashboard - Admin";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">Dashboard Administrativo</h1>
+            <p class="lead text-muted">Painel de controle do sistema</p>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas Principais -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title">Total de Usuários</h6>
+                    <h2>@ViewBag.TotalUsers</h2>
+                    <small>Admins: @ViewBag.TotalAdmins | Vendedores: @ViewBag.TotalVendors | Clientes: @ViewBag.TotalClients</small>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-action="Users" class="text-white text-decoration-none">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title">Total de Lojas</h6>
+                    <h2>@ViewBag.TotalStores</h2>
+                    <small>Lojas registradas no sistema</small>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-action="Stores" class="text-white text-decoration-none">
+                        Ver todas <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-white bg-info">
+                <div class="card-body">
+                    <h6 class="card-title">Total de Produtos</h6>
+                    <h2>@ViewBag.TotalProducts</h2>
+                    <small>Produtos cadastrados</small>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-action="Products" class="text-white text-decoration-none">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title">Receita Total</h6>
+                    <h2>R$ @ViewBag.TotalRevenue.ToString("N2")</h2>
+                    <small>@ViewBag.TotalOrders pedidos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Administrativas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">Ações Administrativas</h3>
+            <div class="d-flex gap-3 flex-wrap">
+                <a asp-action="Users" class="btn btn-primary">
+                    <i class="bi bi-people"></i> Gerenciar Usuários
+                </a>
+                <a asp-action="Stores" class="btn btn-success">
+                    <i class="bi bi-shop"></i> Gerenciar Lojas
+                </a>
+                <a asp-action="Products" class="btn btn-info">
+                    <i class="bi bi-box-seam"></i> Gerenciar Produtos
+                </a>
+                <a asp-action="Categories" class="btn btn-secondary">
+                    <i class="bi bi-tags"></i> Gerenciar Categorias
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pedidos Recentes -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">Pedidos Recentes</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in ViewBag.RecentOrders)
+                        {
+                            <tr>
+                                <td>#@order.Id</td>
+                                <td>@order.User.FullName</td>
+                                <td>R$ @order.Total.ToString("N2")</td>
+                                <td>
+                                    @switch (order.Status.ToString())
+                                    {
+                                        case "Pendente":
+                                            <span class="badge bg-warning">Pendente</span>
+                                            break;
+                                        case "Processando":
+                                            <span class="badge bg-info">Processando</span>
+                                            break;
+                                        case "Enviado":
+                                            <span class="badge bg-primary">Enviado</span>
+                                            break;
+                                        case "Entregue":
+                                            <span class="badge bg-success">Entregue</span>
+                                            break;
+                                        case "Cancelado":
+                                            <span class="badge bg-danger">Cancelado</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
