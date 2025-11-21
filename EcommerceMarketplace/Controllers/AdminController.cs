@@ -288,7 +288,7 @@ public class AdminController : Controller
         }
 
         product.Status = product.Status == EcommerceMarketplace.Enums.ProductStatus.Available
-            ? EcommerceMarketplace.Enums.ProductStatus.Unavailable
+            ? EcommerceMarketplace.Enums.ProductStatus.OutOfStock
             : EcommerceMarketplace.Enums.ProductStatus.Available;
         await _context.SaveChangesAsync();
 
