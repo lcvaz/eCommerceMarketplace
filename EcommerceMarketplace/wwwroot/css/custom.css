@@ -45,10 +45,10 @@
 }
 
 /* ========================================
-   HERO SECTION
+   HERO SECTION - COMENTADO PARA NÃO CONFLITAR COM site.css
    ======================================== */
 
-.hero-section {
+/* .hero-section {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 80px 0;
@@ -56,7 +56,7 @@
 
 .hero-section h1 {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-}
+} */
 
 /* ========================================
    CATEGORIAS
@@ -131,10 +131,11 @@
 }
 
 /* ========================================
-   HERO SECTION - FULL WIDTH COM GRADIENT LONGO
+   HERO SECTION - COMENTADO PARA NÃO CONFLITAR COM site.css
+   As definições da hero section estão no site.css
    ======================================== */
 
-   .hero-section {
+/* .hero-section {
     position: relative;
     min-height: 500px;
     color: white;
@@ -153,7 +154,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;  /* 100% da largura */
+    width: 100%;
     height: 100%;
     z-index: 1;
 }
@@ -162,10 +163,9 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: right center;  /* Imagem alinhada à direita */
+    object-position: right center;
 }
 
-/* Gradient Overlay - Mais Longo e Suave */
 .hero-image-container::after {
     content: '';
     position: absolute;
@@ -174,19 +174,18 @@
     right: 0;
     bottom: 0;
     background: linear-gradient(
-        to right, 
-        rgba(102, 126, 234, 1) 0%,      /* Roxo sólido à esquerda */
-        rgba(102, 126, 234, 0.95) 15%,  /* Quase sólido */
-        rgba(102, 126, 234, 0.85) 30%,  /* Bem opaco */
-        rgba(102, 126, 234, 0.65) 45%,  /* Médio */
-        rgba(102, 126, 234, 0.40) 60%,  /* Começando a clarear */
-        rgba(102, 126, 234, 0.20) 75%,  /* Bem transparente */
-        rgba(102, 126, 234, 0) 90%      /* Totalmente transparente */
+        to right,
+        rgba(102, 126, 234, 1) 0%,
+        rgba(102, 126, 234, 0.95) 15%,
+        rgba(102, 126, 234, 0.85) 30%,
+        rgba(102, 126, 234, 0.65) 45%,
+        rgba(102, 126, 234, 0.40) 60%,
+        rgba(102, 126, 234, 0.20) 75%,
+        rgba(102, 126, 234, 0) 90%
     );
     z-index: 2;
 }
 
-/* Text Shadow para legibilidade */
 .hero-section h1 {
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -195,11 +194,10 @@
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsividade */
 @media (max-width: 992px) {
     .hero-image-container::after {
         background: linear-gradient(
-            to right, 
+            to right,
             rgba(102, 126, 234, 1) 0%,
             rgba(102, 126, 234, 0.9) 20%,
             rgba(102, 126, 234, 0.7) 40%,
@@ -213,12 +211,12 @@
     .hero-section {
         min-height: 400px;
     }
-    
+
     .hero-image-container::after {
-        background: rgba(102, 126, 234, 0.8);  /* Overlay sólido em mobile */
+        background: rgba(102, 126, 234, 0.8);
     }
-    
+
     .hero-content {
         padding: 40px 0;
     }
-}
+} */
