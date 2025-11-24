@@ -241,4 +241,129 @@ public class VendorController : Controller
         // Retorna a View ~/Views/Vendor/Dashboard.cshtml com o ViewModel populado
         return View(viewModel);
     }
+
+    // ===== ACTION: CRIAR NOVA LOJA (GET) =====
+    
+    /// <summary>
+    /// Exibe o formulário para criar uma nova loja.
+    /// Esta é a action que é chamada quando o vendedor clica em "Nova Loja".
+    /// 
+    /// Não precisa fazer nenhuma query ao banco aqui, apenas retorna
+    /// a View com um ViewModel vazio para o vendedor preencher.
+    /// 
+    /// URL: /Vendor/CreateStore
+    /// </summary>
+    [HttpGet]
+    public IActionResult CreateStore()
+    {
+        // Retorna a View com um ViewModel vazio
+        // O ViewModel vazio significa que todos os campos do formulário estarão vazios
+        return View(new CreateStoreViewModel());
+    }
+    
+    // ===== ACTION: CRIAR NOVA LOJA (POST) =====
+    
+    /// <summary>
+    /// Processa o formulário de criação de loja.
+    /// Esta action é chamada quando o vendedor preenche o formulário e clica em "Criar Loja".
+    /// 
+    /// Fluxo:
+    /// 1. Verifica se os dados são válidos (ModelState.IsValid)
+    /// 2. Pega o ID do vendedor logado
+    /// 3. Cria uma nova Store no banco
+    /// 4. Redireciona para o Dashboard
+    /// 
+    /// URL: /Vendor/CreateStore (POST)
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken] // Proteção contra CSRF attacks
+    public async Task<IActionResult> CreateStore(CreateStoreViewModel model)
+    {
+        // ===== VALIDAÇÃO =====
+        // ModelState.IsValid verifica se todos os [Required], [StringLength], etc
+        // foram respeitados. Se alguma validação falhar, retorna o formulário
+        // com as mensagens de erro para o usuário corrigir.
+        
+        if (!ModelState.IsValid)
+        {
+            // Retorna a View com o modelo preenchido e os erros de validação
+            // Assim o usuário vê o que digitou e quais campos têm problemas
+            return View(model);
+        }
+        
+        try
+        {
+            // ===== IDENTIFICAR O VENDEDOR =====
+            // A loja será criada para o vendedor que está logado
+            
+            var vendorId = _userManager.GetUserId(User);
+            
+            if (string.IsNullOrEmpty(vendorId))
+            {
+                _logger.LogError("Tentativa de criar loja sem usuário autenticado");
+                ModelState.AddModelError(string.Empty, "Erro de autenticação. Faça login novamente.");
+                return View(model);
+            }
+            
+            // ===== CRIAR A ENTIDADE STORE =====
+            // Agora vamos transformar o ViewModel (dados do formulário) em uma
+            // entidade Store (modelo do banco de dados)
+            
+            var store = new Store
+            {
+                // Dados básicos
+                Name = model.Name,
+                Description = model.Description,
+                
+                // Contato
+                Phone = model.Phone,
+                ContactEmail = model.ContactEmail,
+                
+                // Endereço
+                Address = model.Address,
+                City = model.City,
+                State = model.State,
+                ZipCode = model.ZipCode,
+                
+                // Associar ao vendedor logado
+                OwnerId = vendorId,
+                
+                // Valores padrão/iniciais
+                Status = StoreStatus.Active,          // Loja começa ativa
+                AverageRating = 0,                    // Sem avaliações ainda
+                TotalReviews = 0,                     // Sem avaliações ainda
+                CreatedAt = DateTime.UtcNow,          // Data/hora da criação
+                UpdatedAt = DateTime.UtcNow           // Mesma data/hora inicialmente
+            };
+            
+            // ===== SALVAR NO BANCO =====
+            
+            _context.Stores.Add(store);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation($"Nova loja criada: '{store.Name}' (ID: {store.Id}) pelo vendedor {vendorId}");
+            
+            // ===== MENSAGEM DE SUCESSO =====
+            // TempData mantém uma mensagem por uma requisição
+            // Vamos usar isso para mostrar uma mensagem de sucesso no Dashboard
+            
+            TempData["SuccessMessage"] = $"Loja '{store.Name}' criada com sucesso!";
+            
+            // ===== REDIRECIONAR =====
+            // Após criar a loja, levamos o vendedor de volta ao Dashboard
+            // onde ele poderá ver a nova loja listada
+            
+            return RedirectToAction(nameof(Dashboard));
+        }
+        catch (Exception ex)
+        {
+            // ===== TRATAMENTO DE ERROS =====
+            // Se algo der errado (problema no banco, etc), logamos o erro
+            // e mostramos uma mensagem amigável ao usuário
+            
+            _logger.LogError(ex, "Erro ao criar loja");
+            ModelState.AddModelError(string.Empty, "Erro ao criar loja. Tente novamente.");
+            return View(model);
+        }
+    }
 }
