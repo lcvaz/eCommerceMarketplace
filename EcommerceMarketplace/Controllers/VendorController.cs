@@ -71,9 +71,9 @@ public class VendorController : Controller
         
         // ===== ETAPA 2: BUSCAR TODAS AS LOJAS DO VENDEDOR =====
         // Um vendedor pode ter múltiplas lojas. Precisamos buscar todas elas.
-        
+
         var vendorStores = await _context.Stores
-            .Where(s => s.OwnerId == vendorId)
+            .Where(s => s.VendorId == vendorId)
             .ToListAsync();
         
         // Se o vendedor não tem nenhuma loja ainda, retornamos um dashboard vazio
@@ -103,15 +103,15 @@ public class VendorController : Controller
         // ===== ETAPA 5: BUSCAR TODOS OS ITENS VENDIDOS =====
         // Esta é a query mais importante. Precisamos buscar todos os OrderItems
         // cujos produtos pertencem às lojas deste vendedor.
-        // 
-        // IMPORTANTE: Filtramos apenas pedidos COMPLETADOS (pagos e confirmados).
+        //
+        // IMPORTANTE: Filtramos apenas pedidos ENTREGUES (completos).
         // Não contamos pedidos pendentes, cancelados ou reembolsados.
-        
+
         var completedOrderItems = await _context.OrderItems
             .Include(oi => oi.Product)           // Precisamos do produto para saber de qual loja é
             .Include(oi => oi.Order)             // Precisamos do pedido para verificar status e data
             .Where(oi => storeIds.Contains(oi.Product.StoreId) &&   // Produto é de uma loja do vendedor
-                        oi.Order.Status == OrderStatus.Completed)    // Pedido está completo
+                        oi.Order.Status == OrderStatus.Delivered)    // Pedido está entregue
             .ToListAsync();
         
         _logger.LogInformation($"Total de itens vendidos (completados): {completedOrderItems.Count}");
@@ -190,18 +190,18 @@ public class VendorController : Controller
         // 3. Para cada grupo, soma as quantidades vendidas
         // 4. Ordena do maior para o menor (mais vendido primeiro)
         // 5. Pega apenas o primeiro (FirstOrDefaultAsync)
-        
+
         var topProduct = await _context.OrderItems
             .Include(oi => oi.Product)
             .Include(oi => oi.Order)
             .Where(oi => storeIds.Contains(oi.Product.StoreId) &&          // Produto do vendedor
-                        oi.Order.Status == OrderStatus.Completed &&        // Pedido completo
+                        oi.Order.Status == OrderStatus.Delivered &&        // Pedido entregue
                         oi.Order.CreatedAt >= threeMonthsAgo)              // Últimos 3 meses
-            .GroupBy(oi => new 
-            { 
-                oi.ProductId, 
-                oi.Product.Name, 
-                oi.Product.ImageUrl 
+            .GroupBy(oi => new
+            {
+                oi.ProductId,
+                oi.Product.Name,
+                oi.Product.ImageUrl
             })
             .Select(g => new TopProductViewModel
             {
