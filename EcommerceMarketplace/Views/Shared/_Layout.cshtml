@@ -56,6 +56,9 @@
                             </div>
                         </form>
 
+                        <!-- Carrinho - usando ViewComponent -->
+                        @await Component.InvokeAsync("CartBadge")
+
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <!-- Usuário Logado -->
