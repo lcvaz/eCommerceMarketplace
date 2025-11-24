@@ -1,0 +1,33 @@
+/* ===== Product Details Page - Specific Styles ===== */
+
+/* Container da imagem principal do produto */
+.product-detail-image-container {
+    position: relative;
+    width: 100%;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.product-detail-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Placeholder quando não há imagem */
+.product-detail-placeholder {
+    width: 100%;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 768px) {
+    .product-detail-placeholder {
+        height: 300px;
+    }
+}

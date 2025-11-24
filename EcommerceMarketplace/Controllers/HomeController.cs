@@ -38,7 +38,7 @@ public class HomeController : Controller
                 .Include(p => p.Category)
                 .Where(p => p.Status == Enums.ProductStatus.Available && p.Stock > 0)
                 .OrderByDescending(p => p.CreatedAt)
-                .Take(8)
+                .Take(12)
                 .ToListAsync()
         };
 

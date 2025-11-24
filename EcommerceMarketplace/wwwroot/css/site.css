@@ -366,3 +366,20 @@ body {
   border-top: 1px solid #dee2e6;
   margin-top: 4rem;
 }
+
+/* ===== Links de Produtos ===== */
+.product-info-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-info-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Garante que o botão Adicionar mantenha seu estilo */
+.product-info-link .btn-add-cart {
+  pointer-events: auto;
+}
