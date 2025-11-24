@@ -52,77 +52,44 @@
         <p class="section-subtitle">Selecionados especialmente para você</p>
 
         <div class="row g-4">
-            <!-- Produto 1 -->
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="product-card">
-                    <div class="product-image">
-                        <i class="bi bi-image"></i>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">Cadernos</div>
-                        <h3 class="product-title">Caderno Minimalista A5</h3>
-                        <p class="product-description">Caderno com capa em tons pastéis. 120 páginas. Perfeito para anotações diárias...</p>
-                        <div class="product-footer">
-                            <span class="product-price">R$ 35,90</span>
-                            <button class="btn-add-cart">Adicionar</button>
+            @foreach (var product in Model.FeaturedProducts)
+            {
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="product-card">
+                        <!-- Imagem do produto - NÃO clicável conforme solicitado -->
+                        <div class="product-image">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-image"></i>
+                            }
                         </div>
+                        
+                        <!-- Área clicável - tudo exceto a imagem -->
+                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="product-info-link">
+                            <div class="product-info">
+                                <div class="product-category">@(product.Category?.Name ?? "Sem categoria")</div>
+                                <h3 class="product-title">@product.Name</h3>
+                                <p class="product-description">
+                                    @if (!string.IsNullOrEmpty(product.Description))
+                                    {
+                                        @(product.Description.Length > 100 ? product.Description.Substring(0, 100) + "..." : product.Description)
+                                    }
+                                </p>
+                                <div class="product-footer">
+                                    <span class="product-price">@product.Price.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</span>
+                                    <button type="button" class="btn-add-cart" onclick="event.preventDefault(); event.stopPropagation(); alert('Adicionar ao carrinho');">
+                                        Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- Produto 2 -->
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="product-card">
-                    <div class="product-image">
-                        <i class="bi bi-image"></i>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">Papéis de presente</div>
-                        <h3 class="product-title">Papel de Presente Botânico</h3>
-                        <p class="product-description">Papel reciclado com estampas de folhas. Sustentável e elegante para todos os tip...</p>
-                        <div class="product-footer">
-                            <span class="product-price">R$ 12,50</span>
-                            <button class="btn-add-cart">Adicionar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Produto 3 -->
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="product-card">
-                    <div class="product-image">
-                        <i class="bi bi-image"></i>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">Cartões</div>
-                        <h3 class="product-title">Kit Cartões Florais</h3>
-                        <p class="product-description">Conjunto com 6 cartões e envelopes. Designs florais exclusivos pintados à mão.</p>
-                        <div class="product-footer">
-                            <span class="product-price">R$ 28,00</span>
-                            <button class="btn-add-cart">Adicionar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Produto 4 -->
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="product-card">
-                    <div class="product-image">
-                        <i class="bi bi-image"></i>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">Impressões</div>
-                        <h3 class="product-title">Impressão Abstract Art</h3>
-                        <p class="product-description">Arte abstrata em papel algodão 300g. Peça única para decoração sofisticada.</p>
-                        <div class="product-footer">
-                            <span class="product-price">R$ 45,00</span>
-                            <button class="btn-add-cart">Adicionar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </section>
