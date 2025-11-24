@@ -62,7 +62,7 @@ public class ProductController : Controller
         var viewModel = new ProductDetailViewModel
         {
             // Dados básicos do produto
-            // Id = product.Id,
+            Id = product.Id,
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
@@ -76,6 +76,7 @@ public class ProductController : Controller
             
             // Dados da loja
             StoreName = product.Store.Name,
+            StoreId = product.Store.Id,
             StoreLogoUrl = product.Store.LogoUrl,
             StoreAverageRating = product.Store.AverageRating,
             StoreTotalReviews = product.Store.TotalReviews,
