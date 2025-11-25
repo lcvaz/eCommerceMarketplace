@@ -1,0 +1,346 @@
+@model CreateProductViewModel
+@{
+    ViewData["Title"] = "Criar Produto";
+    var categories = ViewBag.Categories as List<EcommerceMarketplace.Models.Category>;
+}
+
+@*
+    View para criação de novos produtos.
+    Inclui formulário completo com validação e preview de imagem.
+*@
+
+<div class="container-fluid py-4">
+
+    @* ===== HEADER COM NAVEGAÇÃO ===== *@
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Dashboard">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-action="ManageProducts" asp-route-storeId="@Model.StoreId">
+                            Produtos - @ViewBag.StoreName
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Novo Produto</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-plus-circle me-2"></i>
+                Criar Novo Produto
+            </h1>
+            <p class="text-muted">Preencha as informações abaixo para adicionar um novo produto à loja</p>
+        </div>
+    </div>
+
+    @* ===== FORMULÁRIO ===== *@
+    <div class="row">
+        <div class="col-lg-8">
+            <form asp-action="CreateProduct" method="post" id="productForm">
+                @* Anti-forgery token para segurança *@
+                @Html.AntiForgeryToken()
+
+                @* Campo hidden para StoreId *@
+                <input type="hidden" asp-for="StoreId" />
+
+                @* ===== INFORMAÇÕES BÁSICAS ===== *@
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Informações Básicas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @* Nome do Produto *@
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold"></label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="Ex: Notebook Dell Inspiron 15" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        @* Descrição *@
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                      placeholder="Descreva as características principais do produto..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="text-muted">Máximo de 2000 caracteres</small>
+                        </div>
+
+                        @* SKU *@
+                        <div class="mb-3">
+                            <label asp-for="SKU" class="form-label fw-bold"></label>
+                            <input asp-for="SKU" class="form-control" placeholder="Ex: DELL-INS-15-001" />
+                            <span asp-validation-for="SKU" class="text-danger"></span>
+                            <small class="text-muted">Código único do produto (não pode repetir na mesma loja)</small>
+                        </div>
+
+                        @* Categoria *@
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label fw-bold"></label>
+                            <select asp-for="CategoryId" class="form-select">
+                                <option value="">Selecione uma categoria (opcional)</option>
+                                @if (categories != null)
+                                {
+                                    @foreach (var category in categories)
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* ===== PREÇO E ESTOQUE ===== *@
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cash-stack me-2"></i>
+                            Preço e Estoque
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @* Preço *@
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Price" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input asp-for="Price" class="form-control" type="number" step="0.01"
+                                           placeholder="0,00" />
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+
+                            @* Estoque *@
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Stock" class="form-label fw-bold"></label>
+                                <input asp-for="Stock" class="form-control" type="number" placeholder="0" />
+                                <span asp-validation-for="Stock" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* ===== IMAGEM DO PRODUTO ===== *@
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-image me-2"></i>
+                            Imagem do Produto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label fw-bold"></label>
+                            <input asp-for="ImageUrl" class="form-control" type="url"
+                                   id="imageUrlInput"
+                                   placeholder="https://exemplo.com/imagem-produto.jpg" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            <small class="text-muted">
+                                Cole a URL da imagem do produto. Recomendamos imagens quadradas de pelo menos 500x500px.
+                            </small>
+                        </div>
+
+                        @* Preview da Imagem *@
+                        <div id="imagePreview" class="mt-3 d-none">
+                            <label class="form-label fw-bold">Preview:</label>
+                            <div class="border rounded p-3 bg-light text-center">
+                                <img id="previewImg" src="" alt="Preview"
+                                     style="max-width: 300px; max-height: 300px; object-fit: contain;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* ===== STATUS ===== *@
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-toggles me-2"></i>
+                            Status do Produto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label fw-bold"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="@((int)EcommerceMarketplace.Enums.ProductStatus.Available)">
+                                    Disponível - O produto aparecerá no marketplace
+                                </option>
+                                <option value="@((int)EcommerceMarketplace.Enums.ProductStatus.Draft)">
+                                    Rascunho - O produto não aparecerá no marketplace ainda
+                                </option>
+                                <option value="@((int)EcommerceMarketplace.Enums.ProductStatus.OutOfStock)">
+                                    Sem Estoque - Produto temporariamente indisponível
+                                </option>
+                                <option value="@((int)EcommerceMarketplace.Enums.ProductStatus.Discontinued)">
+                                    Descontinuado - Produto não será mais vendido
+                                </option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* ===== BOTÕES DE AÇÃO ===== *@
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                                <i class="bi bi-check-lg me-2"></i>
+                                Criar Produto
+                            </button>
+                            <a asp-action="ManageProducts" asp-route-storeId="@Model.StoreId"
+                               class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-lg me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Exibir erros gerais de validação *@
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                }
+            </form>
+        </div>
+
+        @* ===== SIDEBAR COM DICAS ===== *@
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Dicas para Cadastro
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Nome claro:</strong> Use nomes descritivos que facilitem a busca
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Descrição completa:</strong> Detalhe características, dimensões e benefícios
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>SKU único:</strong> Facilita o controle de estoque e identificação
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Imagem de qualidade:</strong> Use fotos nítidas com fundo neutro
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Preço competitivo:</strong> Pesquise o mercado antes de definir
+                        </li>
+                        <li class="mb-0">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Estoque atualizado:</strong> Mantenha a quantidade sempre correta
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ===== SCRIPTS ===== *@
+@section Scripts {
+    @* Habilitar validação do lado do cliente *@
+    <partial name="_ValidationScriptsPartial" />
+
+    @* Script para preview de imagem *@
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUrlInput = document.getElementById('imageUrlInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+
+            // Função para atualizar o preview
+            function updatePreview() {
+                const url = imageUrlInput.value.trim();
+
+                if (url) {
+                    previewImg.src = url;
+                    imagePreview.classList.remove('d-none');
+
+                    // Adicionar handler de erro para imagem
+                    previewImg.onerror = function() {
+                        imagePreview.classList.add('d-none');
+                    };
+                } else {
+                    imagePreview.classList.add('d-none');
+                }
+            }
+
+            // Atualizar preview quando o usuário colar ou digitar
+            imageUrlInput.addEventListener('input', function() {
+                // Delay para não fazer requisição a cada tecla
+                clearTimeout(imageUrlInput.previewTimeout);
+                imageUrlInput.previewTimeout = setTimeout(updatePreview, 500);
+            });
+
+            // Atualizar preview quando o campo perder o foco
+            imageUrlInput.addEventListener('blur', updatePreview);
+
+            // Preview inicial se já houver valor (em caso de erro de validação)
+            if (imageUrlInput.value) {
+                updatePreview();
+            }
+        });
+
+        // Formatar campo de preço
+        const priceInput = document.querySelector('input[name="Price"]');
+        if (priceInput) {
+            priceInput.addEventListener('blur', function() {
+                if (this.value) {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        }
+    </script>
+}
+
+@* ===== ESTILOS CUSTOMIZADOS ===== *@
+<style>
+    .card {
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-label {
+        color: #333;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+
+    .sticky-top {
+        position: sticky;
+    }
+
+    #imagePreview img {
+        border-radius: 0.5rem;
+    }
+</style>
