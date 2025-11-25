@@ -41,8 +41,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
     
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
-    
+
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<CustomerAddress> CustomerAddresses { get; set; }
 
     // ========== CONFIGURAÇÕES DE RELACIONAMENTOS ==========
     
@@ -113,14 +114,20 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
             .HasForeignKey(o => o.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);  // Não pode deletar cliente que tem pedidos
 
-        // ===== RELACIONAMENTO: ApplicationUser → Addresses (1:N) =====
-        // Um cliente pode ter vários endereços
-        
-        modelBuilder.Entity<Address>()
-            .HasOne(a => a.Customer)
-            .WithMany(u => u.Addresses)
-            .HasForeignKey(a => a.CustomerId)
-            .OnDelete(DeleteBehavior.Cascade);  // Se deletar user, deleta endereços
+        // ===== RELACIONAMENTO: ApplicationUser ↔ Address (N:M via CustomerAddress) =====
+        // Um cliente pode ter vários endereços e um endereço pode pertencer a vários clientes
+
+        modelBuilder.Entity<CustomerAddress>()
+            .HasOne(ca => ca.Customer)
+            .WithMany(u => u.CustomerAddresses)
+            .HasForeignKey(ca => ca.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);  // Se deletar user, deleta associações
+
+        modelBuilder.Entity<CustomerAddress>()
+            .HasOne(ca => ca.Address)
+            .WithMany(a => a.CustomerAddresses)
+            .HasForeignKey(ca => ca.AddressId)
+            .OnDelete(DeleteBehavior.Cascade);  // Se deletar endereço, deleta associações
 
         // ===== RELACIONAMENTO: ApplicationUser → ReviewsProduct (1:N) =====
         // Um cliente pode fazer várias reviews de produtos
@@ -149,9 +156,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
             .HasForeignKey(p => p.StoreId)
             .OnDelete(DeleteBehavior.Cascade);  // Se deletar loja, deleta produtos
 
+        // ===== RELACIONAMENTO: Store → Address (N:1) =====
+        // Uma loja tem um endereço, um endereço pode ter várias lojas
+
+        modelBuilder.Entity<Store>()
+            .HasOne(s => s.Address)
+            .WithMany(a => a.Stores)
+            .HasForeignKey(s => s.AddressId)
+            .OnDelete(DeleteBehavior.Restrict);  // Não pode deletar endereço que tem lojas
+
         // ===== RELACIONAMENTO: Store → ReviewsStore (1:N) =====
         // Uma loja pode ter várias reviews
-        
+
         modelBuilder.Entity<ReviewStore>()
             .HasOne(r => r.Store)
             .WithMany(s => s.ReviewsStore)

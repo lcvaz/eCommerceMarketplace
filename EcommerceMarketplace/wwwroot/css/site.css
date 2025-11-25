@@ -370,6 +370,8 @@ main {
   background-color: #f8f9fa;
   border-top: 1px solid #dee2e6;
   margin-top: 4rem;
+  bottom: 0 !important;
+  line-height: 0 !important;
 }
 
 /* ===== Links de Produtos ===== */

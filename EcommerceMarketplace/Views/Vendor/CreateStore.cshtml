@@ -1,0 +1,287 @@
+@model CreateStoreViewModel
+@{
+    ViewData["Title"] = "Criar Nova Loja";
+}
+
+@* 
+    Esta View exibe um formulário para o vendedor criar uma nova loja.
+    
+    O formulário usa Bootstrap para styling e tem validações client-side
+    (JavaScript) e server-side (ASP.NET Core).
+    
+    Estrutura:
+    1. Header com título
+    2. Formulário dividido em seções lógicas
+    3. Botões de ação (criar/cancelar)
+*@
+
+<div class="container py-5">
+    
+    @* ===== HEADER ===== *@
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Dashboard">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Criar Loja</li>
+                </ol>
+            </nav>
+            
+            <h1 class="display-5 fw-bold mb-2">
+                <i class="bi bi-shop text-primary me-2"></i>
+                Criar Nova Loja
+            </h1>
+            <p class="text-muted">
+                Preencha as informações abaixo para criar sua loja no marketplace
+            </p>
+        </div>
+    </div>
+    
+    @* ===== FORMULÁRIO ===== *@
+    <div class="row">
+        <div class="col-lg-8 col-xl-6">
+            
+            @* Card que envolve todo o formulário *@
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    
+                    @* 
+                        asp-action="CreateStore" = quando submeter, chama a action CreateStore (POST)
+                        method="post" = este formulário usa POST
+                    *@
+                    <form asp-action="CreateStore" method="post">
+
+                        @*
+                            Token anti-forgery para segurança.
+                            Previne ataques CSRF (Cross-Site Request Forgery)
+                        *@
+                        @Html.AntiForgeryToken()
+                        
+                        @* 
+                            Mostra um resumo de todos os erros de validação no topo do formulário.
+                            Se houver erros, aparece um alerta vermelho listando todos.
+                        *@
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        @* ===== SEÇÃO 1: INFORMAÇÕES BÁSICAS ===== *@
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-info-circle text-primary me-2"></i>
+                                Informações Básicas
+                            </h5>
+                            
+                            @* Campo: Nome da Loja *@
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-semibold"></label>
+                                <input asp-for="Name" class="form-control form-control-lg" 
+                                       placeholder="Ex: Eletrônicos Premium" 
+                                       autofocus />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Este será o nome exibido aos clientes no marketplace
+                                </div>
+                            </div>
+                            
+                            @* Campo: Descrição *@
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold"></label>
+                                <textarea asp-for="Description" class="form-control" rows="4"
+                                          placeholder="Descreva o que sua loja vende e seus diferenciais..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Uma boa descrição ajuda os clientes a conhecerem sua loja
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @* ===== SEÇÃO 2: INFORMAÇÕES DE CONTATO ===== *@
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-telephone text-primary me-2"></i>
+                                Informações de Contato
+                            </h5>
+                            
+                            @* Campo: Telefone *@
+                            <div class="mb-3">
+                                <label asp-for="Phone" class="form-label fw-semibold"></label>
+                                <input asp-for="Phone" class="form-control" 
+                                       placeholder="(11) 98765-4321" 
+                                       type="tel" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Número para os clientes entrarem em contato
+                                </div>
+                            </div>
+                            
+                            @* Campo: Email de Contato *@
+                            <div class="mb-3">
+                                <label asp-for="ContactEmail" class="form-label fw-semibold"></label>
+                                <input asp-for="ContactEmail" class="form-control" 
+                                       placeholder="contato@minhaloja.com" 
+                                       type="email" />
+                                <span asp-validation-for="ContactEmail" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Email para atendimento aos clientes
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @* ===== SEÇÃO 3: ENDEREÇO ===== *@
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-geo-alt text-primary me-2"></i>
+                                Endereço
+                            </h5>
+
+                            @* Campo: CEP *@
+                            <div class="mb-3">
+                                <label asp-for="ZipCode" class="form-label fw-semibold"></label>
+                                <input asp-for="ZipCode" class="form-control"
+                                       placeholder="00000-000"
+                                       maxlength="9"
+                                       id="zipcode-input" />
+                                <span asp-validation-for="ZipCode" class="text-danger small"></span>
+                                <div class="form-text">
+                                    Necessário para cálculo de frete
+                                </div>
+                            </div>
+
+                            @* Linha com Rua e Número lado a lado *@
+                            <div class="row">
+                                @* Campo: Rua/Avenida *@
+                                <div class="col-md-8 mb-3">
+                                    <label asp-for="Street" class="form-label fw-semibold"></label>
+                                    <input asp-for="Street" class="form-control"
+                                           placeholder="Av. Paulista" />
+                                    <span asp-validation-for="Street" class="text-danger small"></span>
+                                </div>
+
+                                @* Campo: Número *@
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="Number" class="form-label fw-semibold"></label>
+                                    <input asp-for="Number" class="form-control"
+                                           placeholder="1000" />
+                                    <span asp-validation-for="Number" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            @* Campo: Complemento *@
+                            <div class="mb-3">
+                                <label asp-for="Complement" class="form-label fw-semibold"></label>
+                                <input asp-for="Complement" class="form-control"
+                                       placeholder="Sala 301, Bloco A, etc." />
+                                <span asp-validation-for="Complement" class="text-danger small"></span>
+                            </div>
+
+                            @* Campo: Bairro *@
+                            <div class="mb-3">
+                                <label asp-for="Neighborhood" class="form-label fw-semibold"></label>
+                                <input asp-for="Neighborhood" class="form-control"
+                                       placeholder="Bela Vista" />
+                                <span asp-validation-for="Neighborhood" class="text-danger small"></span>
+                            </div>
+
+                            @* Linha com Cidade e Estado lado a lado *@
+                            <div class="row">
+                                @* Campo: Cidade *@
+                                <div class="col-md-8 mb-3">
+                                    <label asp-for="City" class="form-label fw-semibold"></label>
+                                    <input asp-for="City" class="form-control"
+                                           placeholder="São Paulo" />
+                                    <span asp-validation-for="City" class="text-danger small"></span>
+                                </div>
+
+                                @* Campo: Estado (UF) *@
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="State" class="form-label fw-semibold"></label>
+                                    <input asp-for="State" class="form-control text-uppercase"
+                                           placeholder="SP"
+                                           maxlength="2"
+                                           style="text-transform: uppercase;" />
+                                    <span asp-validation-for="State" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @* ===== BOTÕES DE AÇÃO ===== *@
+                        <div class="d-flex gap-2 justify-content-between">
+                            @* Botão Cancelar - volta para o Dashboard *@
+                            <a asp-action="Dashboard" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                            
+                            @* Botão Criar Loja - submete o formulário *@
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg me-1"></i>Criar Loja
+                            </button>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+            
+            @* Card com dicas *@
+            <div class="card border-0 bg-light mt-3">
+                <div class="card-body">
+                    <h6 class="mb-2">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        Dica
+                    </h6>
+                    <p class="small mb-0 text-muted">
+                        Após criar sua loja, você poderá adicionar produtos e começar a vender. 
+                        Você pode criar múltiplas lojas se quiser vender categorias diferentes de produtos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@* ===== SCRIPTS DE VALIDAÇÃO E MÁSCARAS ===== *@
+@section Scripts {
+    @*
+        jQuery Validation é necessário para validação client-side.
+        Valida os campos antes de enviar para o servidor.
+    *@
+    <partial name="_ValidationScriptsPartial" />
+
+    @* Script customizado para máscaras de CEP e outras funcionalidades *@
+    <script src="~/js/vendor-createstore.js"></script>
+}
+
+@* ===== ESTILOS CUSTOMIZADOS ===== *@
+<style>
+    /* Melhorar a aparência dos campos de formulário */
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    /* Espaçamento entre seções do formulário */
+    .mb-4 {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    /* Última seção não precisa de borda */
+    .mb-4:last-of-type {
+        border-bottom: none;
+    }
+    
+    /* Estilo para campos obrigatórios */
+    .form-label.fw-semibold::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    /* Remover asterisco de campos opcionais */
+    label[for="Description"]::after,
+    label[for="Phone"]::after,
+    label[for="ContactEmail"]::after,
+    label[for="Complement"]::after {
+        content: "" !important;
+    }
+</style>

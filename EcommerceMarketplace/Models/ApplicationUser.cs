@@ -40,16 +40,16 @@ public class ApplicationUser : IdentityUser
     // O vendedor terá lojas 
     public ICollection<Store> Stores { get; set; } = new List<Store>();
 
-    // O cliente terá pedidos 
+    // O cliente terá pedidos
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    // O cliente terá endereços de entrega
-    public ICollection<Address> Addresses { get; set; } = new List<Address>();
+    // O cliente terá endereços de entrega (relação N:M via CustomerAddress)
+    public ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
 
     // O cliente terá avaliações feitas
     public ICollection<ReviewProduct> ReviewsProduct { get; set; } = new List<ReviewProduct>();
     public ICollection<ReviewStore> ReviewsStore { get; set; } = new List<ReviewStore>();
-        
-    // O cliente terá carrinho , porém não obrigatoriamente 
+
+    // O cliente terá carrinho, porém não obrigatoriamente
     public Cart? Cart { get; set; }
 }
