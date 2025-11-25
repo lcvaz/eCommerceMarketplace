@@ -134,46 +134,73 @@
                                 <i class="bi bi-geo-alt text-primary me-2"></i>
                                 Endereço
                             </h5>
-                            
-                            @* Campo: Endereço *@
-                            <div class="mb-3">
-                                <label asp-for="Address" class="form-label fw-semibold"></label>
-                                <input asp-for="Address" class="form-control" 
-                                       placeholder="Rua, número, complemento" />
-                                <span asp-validation-for="Address" class="text-danger small"></span>
-                            </div>
-                            
-                            @* Linha com Cidade e Estado lado a lado *@
-                            <div class="row">
-                                @* Campo: Cidade *@
-                                <div class="col-md-8 mb-3">
-                                    <label asp-for="City" class="form-label fw-semibold"></label>
-                                    <input asp-for="City" class="form-control" 
-                                           placeholder="São Paulo" />
-                                    <span asp-validation-for="City" class="text-danger small"></span>
-                                </div>
-                                
-                                @* Campo: Estado (UF) *@
-                                <div class="col-md-4 mb-3">
-                                    <label asp-for="State" class="form-label fw-semibold"></label>
-                                    <input asp-for="State" class="form-control text-uppercase" 
-                                           placeholder="SP" 
-                                           maxlength="2"
-                                           style="text-transform: uppercase;" />
-                                    <span asp-validation-for="State" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            
+
                             @* Campo: CEP *@
                             <div class="mb-3">
                                 <label asp-for="ZipCode" class="form-label fw-semibold"></label>
-                                <input asp-for="ZipCode" class="form-control" 
-                                       placeholder="00000-000" 
+                                <input asp-for="ZipCode" class="form-control"
+                                       placeholder="00000-000"
                                        maxlength="9"
                                        id="zipcode-input" />
                                 <span asp-validation-for="ZipCode" class="text-danger small"></span>
                                 <div class="form-text">
                                     Necessário para cálculo de frete
+                                </div>
+                            </div>
+
+                            @* Linha com Rua e Número lado a lado *@
+                            <div class="row">
+                                @* Campo: Rua/Avenida *@
+                                <div class="col-md-8 mb-3">
+                                    <label asp-for="Street" class="form-label fw-semibold"></label>
+                                    <input asp-for="Street" class="form-control"
+                                           placeholder="Av. Paulista" />
+                                    <span asp-validation-for="Street" class="text-danger small"></span>
+                                </div>
+
+                                @* Campo: Número *@
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="Number" class="form-label fw-semibold"></label>
+                                    <input asp-for="Number" class="form-control"
+                                           placeholder="1000" />
+                                    <span asp-validation-for="Number" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            @* Campo: Complemento *@
+                            <div class="mb-3">
+                                <label asp-for="Complement" class="form-label fw-semibold"></label>
+                                <input asp-for="Complement" class="form-control"
+                                       placeholder="Sala 301, Bloco A, etc." />
+                                <span asp-validation-for="Complement" class="text-danger small"></span>
+                            </div>
+
+                            @* Campo: Bairro *@
+                            <div class="mb-3">
+                                <label asp-for="Neighborhood" class="form-label fw-semibold"></label>
+                                <input asp-for="Neighborhood" class="form-control"
+                                       placeholder="Bela Vista" />
+                                <span asp-validation-for="Neighborhood" class="text-danger small"></span>
+                            </div>
+
+                            @* Linha com Cidade e Estado lado a lado *@
+                            <div class="row">
+                                @* Campo: Cidade *@
+                                <div class="col-md-8 mb-3">
+                                    <label asp-for="City" class="form-label fw-semibold"></label>
+                                    <input asp-for="City" class="form-control"
+                                           placeholder="São Paulo" />
+                                    <span asp-validation-for="City" class="text-danger small"></span>
+                                </div>
+
+                                @* Campo: Estado (UF) *@
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="State" class="form-label fw-semibold"></label>
+                                    <input asp-for="State" class="form-control text-uppercase"
+                                           placeholder="SP"
+                                           maxlength="2"
+                                           style="text-transform: uppercase;" />
+                                    <span asp-validation-for="State" class="text-danger small"></span>
                                 </div>
                             </div>
                         </div>
@@ -215,61 +242,14 @@
 
 @* ===== SCRIPTS DE VALIDAÇÃO E MÁSCARAS ===== *@
 @section Scripts {
-    @* 
+    @*
         jQuery Validation é necessário para validação client-side.
         Valida os campos antes de enviar para o servidor.
     *@
     <partial name="_ValidationScriptsPartial" />
-    
+
     @* Script customizado para máscaras de CEP e outras funcionalidades *@
-    <script>
-        // ===== MÁSCARA PARA CEP =====
-        // Formata automaticamente o CEP enquanto o usuário digita
-        // Transforma "01310100" em "01310-100"
-        
-        document.getElementById('zipcode-input').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-            
-            if (value.length > 5) {
-                // Adiciona o hífen após o 5º dígito
-                value = value.slice(0, 5) + '-' + value.slice(5, 8);
-            }
-            
-            e.target.value = value;
-        });
-        
-        // ===== AUTO-FOCO NO PRIMEIRO CAMPO COM ERRO =====
-        // Se houver erros de validação, coloca o foco no primeiro campo com erro
-        
-        window.addEventListener('DOMContentLoaded', function() {
-            const firstError = document.querySelector('.field-validation-error');
-            if (firstError) {
-                const input = firstError.parentElement.querySelector('input, textarea');
-                if (input) {
-                    input.focus();
-                }
-            }
-        });
-        
-        // ===== CONFIRMAÇÃO ANTES DE CANCELAR SE HOUVER DADOS PREENCHIDOS =====
-        // Previne perda acidental de dados
-        
-        let formChanged = false;
-        const form = document.querySelector('form');
-        const inputs = form.querySelectorAll('input, textarea');
-        
-        inputs.forEach(input => {
-            input.addEventListener('change', () => {
-                formChanged = true;
-            });
-        });
-        
-        document.querySelector('a[href*="Dashboard"]').addEventListener('click', function(e) {
-            if (formChanged && !confirm('Deseja realmente cancelar? Os dados preenchidos serão perdidos.')) {
-                e.preventDefault();
-            }
-        });
-    </script>
+    <script src="~/js/vendor-createstore.js"></script>
 }
 
 @* ===== ESTILOS CUSTOMIZADOS ===== *@
@@ -300,7 +280,8 @@
     /* Remover asterisco de campos opcionais */
     label[for="Description"]::after,
     label[for="Phone"]::after,
-    label[for="ContactEmail"]::after {
+    label[for="ContactEmail"]::after,
+    label[for="Complement"]::after {
         content: "" !important;
     }
 </style>

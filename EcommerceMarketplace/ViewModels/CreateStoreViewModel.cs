@@ -71,19 +71,55 @@ public class CreateStoreViewModel
     
     // ===== ENDEREÇO DA LOJA =====
     // Importante para lojas físicas ou para cálculo de frete
-    
+    // Os campos abaixo serão usados para criar um Address no banco
+
     /// <summary>
-    /// Endereço completo da loja (rua, número, complemento).
-    /// Exemplo: "Av. Paulista, 1000, Sala 301"
-    /// 
-    /// Obrigatório porque precisamos saber de onde os produtos serão enviados
-    /// para calcular o frete corretamente.
+    /// CEP da loja para cálculo de frete.
+    /// Exemplo: "01310-100"
+    ///
+    /// O formato brasileiro de CEP é XXXXX-XXX (5 dígitos, hífen, 3 dígitos).
     /// </summary>
-    [Display(Name = "Endereço")]
-    [Required(ErrorMessage = "O endereço é obrigatório")]
-    [StringLength(200, MinimumLength = 5, ErrorMessage = "O endereço deve ter entre 5 e 200 caracteres")]
-    public string Address { get; set; } = string.Empty;
-    
+    [Display(Name = "CEP")]
+    [Required(ErrorMessage = "O CEP é obrigatório")]
+    [RegularExpression(@"^\d{5}-\d{3}$", ErrorMessage = "CEP deve estar no formato 00000-000")]
+    [StringLength(9, MinimumLength = 9, ErrorMessage = "CEP deve ter 9 caracteres")]
+    public string ZipCode { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Rua/Avenida da loja.
+    /// Exemplo: "Av. Paulista"
+    /// </summary>
+    [Display(Name = "Rua/Avenida")]
+    [Required(ErrorMessage = "A rua é obrigatória")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "A rua deve ter entre 3 e 200 caracteres")]
+    public string Street { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Número do estabelecimento.
+    /// Exemplo: "1000"
+    /// </summary>
+    [Display(Name = "Número")]
+    [Required(ErrorMessage = "O número é obrigatório")]
+    [StringLength(10, ErrorMessage = "O número deve ter no máximo 10 caracteres")]
+    public string Number { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Complemento (Sala, Andar, Bloco, etc).
+    /// Exemplo: "Sala 301"
+    /// </summary>
+    [Display(Name = "Complemento")]
+    [StringLength(100, ErrorMessage = "O complemento deve ter no máximo 100 caracteres")]
+    public string? Complement { get; set; }
+
+    /// <summary>
+    /// Bairro da loja.
+    /// Exemplo: "Bela Vista"
+    /// </summary>
+    [Display(Name = "Bairro")]
+    [Required(ErrorMessage = "O bairro é obrigatório")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "O bairro deve ter entre 2 e 100 caracteres")]
+    public string Neighborhood { get; set; } = string.Empty;
+
     /// <summary>
     /// Cidade onde a loja está localizada.
     /// Exemplo: "São Paulo"
@@ -92,11 +128,11 @@ public class CreateStoreViewModel
     [Required(ErrorMessage = "A cidade é obrigatória")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "A cidade deve ter entre 2 e 100 caracteres")]
     public string City { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Estado (UF) da loja.
     /// Exemplo: "SP", "RJ", "MG"
-    /// 
+    ///
     /// Validamos com RegularExpression para garantir que são 2 letras maiúsculas.
     /// </summary>
     [Display(Name = "Estado (UF)")]
@@ -104,19 +140,6 @@ public class CreateStoreViewModel
     [RegularExpression(@"^[A-Z]{2}$", ErrorMessage = "Estado deve ser no formato XX (ex: SP, RJ)")]
     [StringLength(2, MinimumLength = 2, ErrorMessage = "Estado deve ter 2 caracteres")]
     public string State { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// CEP da loja para cálculo de frete.
-    /// Exemplo: "01310-100"
-    /// 
-    /// O formato brasileiro de CEP é XXXXX-XXX (5 dígitos, hífen, 3 dígitos).
-    /// Usamos RegularExpression para garantir este formato.
-    /// </summary>
-    [Display(Name = "CEP")]
-    [Required(ErrorMessage = "O CEP é obrigatório")]
-    [RegularExpression(@"^\d{5}-\d{3}$", ErrorMessage = "CEP deve estar no formato 00000-000")]
-    [StringLength(9, MinimumLength = 9, ErrorMessage = "CEP deve ter 9 caracteres")]
-    public string ZipCode { get; set; } = string.Empty;
     
     // ===== NOTA SOBRE O DONO DA LOJA =====
     // Repara que não temos uma propriedade "OwnerId" aqui.
