@@ -305,29 +305,70 @@ public class VendorController : Controller
                 return View(model);
             }
             
+            // ===== CRIAR O ENDEREÇO =====
+            // Primeiro, criamos o endereço no banco de dados.
+            // Verificamos se já existe um endereço idêntico para reutilizá-lo.
+
+            var existingAddress = await _context.Addresses
+                .FirstOrDefaultAsync(a =>
+                    a.ZipCode == model.ZipCode &&
+                    a.Street == model.Street &&
+                    a.Number == model.Number &&
+                    (a.Complement == model.Complement || (a.Complement == null && model.Complement == null)) &&
+                    a.Neighborhood == model.Neighborhood &&
+                    a.City == model.City &&
+                    a.State == model.State);
+
+            Address address;
+
+            if (existingAddress != null)
+            {
+                // Reutiliza o endereço existente
+                address = existingAddress;
+                _logger.LogInformation($"Reutilizando endereço existente (ID: {address.Id})");
+            }
+            else
+            {
+                // Cria um novo endereço
+                address = new Address
+                {
+                    ZipCode = model.ZipCode,
+                    Street = model.Street,
+                    Number = model.Number,
+                    Complement = model.Complement,
+                    Neighborhood = model.Neighborhood,
+                    City = model.City,
+                    State = model.State,
+                    Country = "Brasil",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.Addresses.Add(address);
+                await _context.SaveChangesAsync();  // Salva para obter o ID
+
+                _logger.LogInformation($"Novo endereço criado (ID: {address.Id})");
+            }
+
             // ===== CRIAR A ENTIDADE STORE =====
-            // Agora vamos transformar o ViewModel (dados do formulário) em uma
-            // entidade Store (modelo do banco de dados)
-            
+            // Agora criamos a loja associando-a ao endereço criado/reutilizado
+
             var store = new Store
             {
                 // Dados básicos
                 Name = model.Name,
                 Description = model.Description,
-                
+
                 // Contato
                 Phone = model.Phone,
                 ContactEmail = model.ContactEmail,
-                
-                // Endereço
-                Address = model.Address,
-                City = model.City,
-                State = model.State,
-                ZipCode = model.ZipCode,
-                
+
+                // Associar ao endereço
+                AddressId = address.Id,
+
                 // Associar ao vendedor logado
                 VendorId = vendorId,
-                
+
                 // Valores padrão/iniciais
                 Status = StoreStatus.Active,          // Loja começa ativa
                 //AverageRating = 0,                    // Sem avaliações ainda
@@ -335,9 +376,9 @@ public class VendorController : Controller
                 CreatedAt = DateTime.UtcNow,          // Data/hora da criação
                 //UpdatedAt = DateTime.UtcNow           // Mesma data/hora inicialmente
             };
-            
+
             // ===== SALVAR NO BANCO =====
-            
+
             _context.Stores.Add(store);
             await _context.SaveChangesAsync();
             
