@@ -1,0 +1,308 @@
+@model VendorDashboardViewModel
+@{
+    ViewData["Title"] = "Painel do Vendedor";
+}
+
+@* 
+    Esta é a View do Dashboard do Vendedor.
+    Ela recebe um VendorDashboardViewModel do Controller e renderiza todas as informações.
+    
+    O layout segue o protótipo: 
+    1. Header com título e botão de nova loja
+    2. Cards de métricas gerais (produtos, vendas, receita)
+    3. Seção de lojas com cards individuais
+    4. Seção de produto mais vendido
+*@
+
+<div class="container-fluid py-4">
+    
+    @* ===== HEADER COM TÍTULO E BOTÃO ===== *@
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">Painel do Vendedor</h1>
+            <p class="text-muted">Gerencie seus produtos e vendas</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            @* Botão para criar nova loja - só aparece se já tiver pelo menos uma loja *@
+            @* Se não tiver lojas, vamos mostrar um botão maior no meio da tela *@
+            @if (Model.HasStores)
+            {
+                <a asp-action="CreateStore" class="btn btn-dark btn-lg">
+                    <i class="bi bi-plus-lg me-2"></i>Nova Loja
+                </a>
+            }
+        </div>
+    </div>
+    
+    @* ===== VERIFICAR SE O VENDEDOR TEM LOJAS ===== *@
+    @* Se não tiver, mostramos uma mensagem convidando a criar a primeira loja *@
+    
+    @if (!Model.HasStores)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm text-center py-5">
+                    <div class="card-body">
+                        <i class="bi bi-shop display-1 text-muted mb-3"></i>
+                        <h2 class="mb-3">Bem-vindo ao seu painel!</h2>
+                        <p class="text-muted mb-4">
+                            Você ainda não possui nenhuma loja cadastrada. 
+                            Crie sua primeira loja para começar a vender no marketplace.
+                        </p>
+                        <a asp-action="CreateStore" class="btn btn-dark btn-lg">
+                            <i class="bi bi-plus-lg me-2"></i>Criar Minha Primeira Loja
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* ===== CARDS DE MÉTRICAS GERAIS (TOPO) ===== *@
+        @* Estes três cards mostram as métricas totais de todas as lojas *@
+        
+        <div class="row g-4 mb-5">
+            @* Card 1: Total de Produtos *@
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded bg-light">
+                                    <i class="bi bi-box-seam text-primary fs-2"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-muted mb-1 small">Meus Produtos</p>
+                                <h2 class="mb-0 fw-bold">@Model.TotalProducts</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            @* Card 2: Vendas Realizadas *@
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded bg-light">
+                                    <i class="bi bi-bag-check text-success fs-2"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-muted mb-1 small">Vendas Realizadas</p>
+                                <h2 class="mb-0 fw-bold">@Model.TotalSales</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            @* Card 3: Receita Total *@
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-3 rounded bg-light">
+                                    <i class="bi bi-currency-dollar text-warning fs-2"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-muted mb-1 small">Receita Total</p>
+                                <h2 class="mb-0 fw-bold">@Model.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        @* ===== SEÇÃO DE LOJAS ===== *@
+        @* Lista todas as lojas do vendedor com suas métricas individuais *@
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h3 class="mb-4">Minhas Lojas</h3>
+            </div>
+            
+            @* Loop por cada loja e criar um card *@
+            @foreach (var store in Model.Stores)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            @* Header do card com ícone e nome da loja *@
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="flex-shrink-0">
+                                    @if (!string.IsNullOrEmpty(store.LogoUrl))
+                                    {
+                                        <img src="@store.LogoUrl" alt="@store.Name" 
+                                             class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 rounded bg-light">
+                                            <i class="bi bi-shop text-primary fs-4"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-1">@store.Name</h5>
+                                    @if (!string.IsNullOrEmpty(store.Description))
+                                    {
+                                        <p class="text-muted small mb-0">@store.Description</p>
+                                    }
+                                </div>
+                            </div>
+                            
+                            @* Métricas da loja *@
+                            <hr class="my-3">
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <p class="text-muted small mb-1">Vendas</p>
+                                    <h4 class="mb-0 fw-bold text-success">@store.Sales</h4>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-muted small mb-1">Receita</p>
+                                    <h4 class="mb-0 fw-bold text-success">@store.Revenue.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</h4>
+                                </div>
+                            </div>
+                            
+                            @* Badge de status da loja *@
+                            <div class="mb-3">
+                                <span class="badge @store.StatusBadgeClass">
+                                    @store.Status
+                                </span>
+                            </div>
+                            
+                            @* Botões de ação *@
+                            <div class="d-grid gap-2">
+                                <a asp-action="ManageStore" asp-route-id="@store.Id" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-gear me-1"></i>Gerenciar Loja
+                                </a>
+                                <a asp-action="ManageProducts" asp-route-storeId="@store.Id" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-box-seam me-1"></i>Gerenciar Produtos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        @* ===== SEÇÃO DE PRODUTO MAIS VENDIDO ===== *@
+        @* Mostra o produto com melhor desempenho nos últimos 3 meses *@
+        
+        @if (Model.TopProduct != null)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="mb-4">
+                        <i class="bi bi-graph-up text-success me-2"></i>
+                        Produto Mais Vendido (últimos 3 meses)
+                    </h3>
+                </div>
+                
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                @* Imagem do produto *@
+                                <div class="col-md-2">
+                                    <img src="@Model.TopProduct.ImageUrl" 
+                                         alt="@Model.TopProduct.ProductName" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 150px; object-fit: cover;">
+                                </div>
+                                
+                                @* Informações do produto *@
+                                <div class="col-md-6">
+                                    <h4 class="mb-2">@Model.TopProduct.ProductName</h4>
+                                    <p class="text-muted mb-3">
+                                        <i class="bi bi-star-fill text-warning me-1"></i>
+                                        Destaque de vendas no período
+                                    </p>
+                                    <a asp-controller="Product" asp-action="Details" 
+                                       asp-route-id="@Model.TopProduct.ProductId"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>Ver Produto
+                                    </a>
+                                </div>
+                                
+                                @* Métricas do produto *@
+                                <div class="col-md-4">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <p class="text-muted small mb-1">Unidades Vendidas</p>
+                                            <h3 class="mb-0 fw-bold text-success">@Model.TopProduct.UnitsSold</h3>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="text-muted small mb-1">Receita Gerada</p>
+                                            <h3 class="mb-0 fw-bold text-success">
+                                                @Model.TopProduct.RevenueGenerated.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.HasSales)
+        {
+            @* Se tem vendas mas não nos últimos 3 meses *@
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Nenhuma venda registrada nos últimos 3 meses.
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    
+</div>
+
+@* ===== ESTILOS CUSTOMIZADOS ===== *@
+<style>
+    /* Deixar os cards com uma elevação sutil */
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+    
+    /* Transição suave ao passar o mouse sobre os cards */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Melhorar aparência dos badges */
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+    }
+    
+    /* Garantir que os cards de loja tenham altura igual */
+    .h-100 {
+        height: 100% !important;
+    }
+</style>
+
+@* ===== SCRIPTS ===== *@
+@section Scripts {
+    <script src="~/js/vendor-dashboard.js"></script>
+}

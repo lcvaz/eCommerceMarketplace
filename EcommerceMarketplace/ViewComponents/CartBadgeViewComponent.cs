@@ -30,7 +30,8 @@ public class CartBadgeViewComponent : ViewComponent
     public async Task<IViewComponentResult> InvokeAsync()
     {
         // Se o usuário não estiver autenticado, retornar 0
-        if (!UserClaimsPrincipal.Identity?.IsAuthenticated ?? true)
+        // Em ViewComponents, usamos HttpContext.User que retorna ClaimsPrincipal
+        if (!(HttpContext.User?.Identity?.IsAuthenticated ?? false))
         {
             return View(0);
         }
@@ -38,7 +39,8 @@ public class CartBadgeViewComponent : ViewComponent
         try
         {
             // Obter o ID do usuário atual
-            var userId = _userManager.GetUserId(UserClaimsPrincipal);
+            // HttpContext.User retorna ClaimsPrincipal, que é o tipo esperado pelo UserManager
+            var userId = _userManager.GetUserId(HttpContext.User);
 
             if (string.IsNullOrEmpty(userId))
             {
