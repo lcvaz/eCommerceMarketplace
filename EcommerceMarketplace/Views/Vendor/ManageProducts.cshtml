@@ -1,0 +1,255 @@
+@model ManageProductsViewModel
+@{
+    ViewData["Title"] = "Gerenciar Produtos";
+}
+
+@*
+    View para gerenciamento de produtos de uma loja específica.
+    Exibe lista de produtos com opção de criar novo produto.
+*@
+
+<div class="container-fluid py-4">
+
+    @* ===== HEADER COM TÍTULO E BOTÃO ===== *@
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Dashboard">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Gerenciar Produtos</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-box-seam me-2"></i>
+                Produtos - @Model.StoreName
+            </h1>
+            @if (!string.IsNullOrEmpty(Model.StoreDescription))
+            {
+                <p class="text-muted">@Model.StoreDescription</p>
+            }
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="CreateProduct" asp-route-storeId="@Model.StoreId" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-lg me-2"></i>Novo Produto
+            </a>
+        </div>
+    </div>
+
+    @* ===== MENSAGENS DE SUCESSO/ERRO ===== *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* ===== VERIFICAR SE A LOJA TEM PRODUTOS ===== *@
+    @if (!Model.HasProducts)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm text-center py-5">
+                    <div class="card-body">
+                        <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                        <h2 class="mb-3">Nenhum produto cadastrado</h2>
+                        <p class="text-muted mb-4">
+                            Você ainda não adicionou produtos a esta loja.
+                            Comece criando seu primeiro produto para aparecer no marketplace.
+                        </p>
+                        <a asp-action="CreateProduct" asp-route-storeId="@Model.StoreId" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-lg me-2"></i>Criar Primeiro Produto
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* ===== ESTATÍSTICAS RÁPIDAS ===== *@
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Total de Produtos</p>
+                        <h3 class="mb-0 fw-bold">@Model.TotalProducts</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Produtos Disponíveis</p>
+                        <h3 class="mb-0 fw-bold text-success">
+                            @Model.Products.Count(p => p.Status == EcommerceMarketplace.Enums.ProductStatus.Available)
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Sem Estoque</p>
+                        <h3 class="mb-0 fw-bold text-warning">
+                            @Model.Products.Count(p => p.Stock == 0)
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Rascunhos</p>
+                        <h3 class="mb-0 fw-bold text-secondary">
+                            @Model.Products.Count(p => p.Status == EcommerceMarketplace.Enums.ProductStatus.Draft)
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ===== LISTA DE PRODUTOS ===== *@
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Todos os Produtos</h5>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 80px;">Imagem</th>
+                                        <th>Produto</th>
+                                        <th>SKU</th>
+                                        <th>Categoria</th>
+                                        <th>Preço</th>
+                                        <th>Estoque</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <img src="@product.ImageUrl"
+                                                     alt="@product.Name"
+                                                     class="img-thumbnail"
+                                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                            </td>
+                                            <td>
+                                                <strong>@product.Name</strong>
+                                                @if (!string.IsNullOrEmpty(product.Description))
+                                                {
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        @(product.Description.Length > 60
+                                                            ? product.Description.Substring(0, 60) + "..."
+                                                            : product.Description)
+                                                    </small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <code>@product.SKU</code>
+                                            </td>
+                                            <td>
+                                                @if (product.Category != null)
+                                                {
+                                                    <span class="badge bg-info">@product.Category.Name</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong>@product.Price.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                                            </td>
+                                            <td>
+                                                @if (product.Stock > 0)
+                                                {
+                                                    <span class="badge bg-success">@product.Stock</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">0</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (product.Status)
+                                                {
+                                                    case EcommerceMarketplace.Enums.ProductStatus.Available:
+                                                        <span class="badge bg-success">Disponível</span>
+                                                        break;
+                                                    case EcommerceMarketplace.Enums.ProductStatus.OutOfStock:
+                                                        <span class="badge bg-warning text-dark">Sem Estoque</span>
+                                                        break;
+                                                    case EcommerceMarketplace.Enums.ProductStatus.Discontinued:
+                                                        <span class="badge bg-danger">Descontinuado</span>
+                                                        break;
+                                                    case EcommerceMarketplace.Enums.ProductStatus.Draft:
+                                                        <span class="badge bg-secondary">Rascunho</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-controller="Product"
+                                                       asp-action="Details"
+                                                       asp-route-id="@product.Id"
+                                                       class="btn btn-outline-primary"
+                                                       title="Ver Produto">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    @* Futuramente adicionar botões de editar e excluir *@
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* ===== ESTILOS CUSTOMIZADOS ===== *@
+<style>
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .img-thumbnail {
+        border-radius: 0.5rem;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+    }
+</style>

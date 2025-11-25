@@ -407,4 +407,240 @@ public class VendorController : Controller
             return View(model);
         }
     }
+
+    // ===== ACTION: GERENCIAR PRODUTOS DE UMA LOJA (GET) =====
+
+    /// <summary>
+    /// Exibe a página de gerenciamento de produtos de uma loja específica.
+    ///
+    /// Fluxo:
+    /// 1. Verifica se a loja existe e pertence ao vendedor logado
+    /// 2. Busca todos os produtos da loja
+    /// 3. Retorna a view com o ViewModel populado
+    ///
+    /// URL: /Vendor/ManageProducts?storeId=1
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> ManageProducts(int storeId)
+    {
+        // ===== IDENTIFICAR O VENDEDOR =====
+        var vendorId = _userManager.GetUserId(User);
+
+        if (string.IsNullOrEmpty(vendorId))
+        {
+            _logger.LogWarning("Tentativa de acessar gerenciamento de produtos sem usuário autenticado");
+            return RedirectToAction("Login", "Account");
+        }
+
+        // ===== BUSCAR A LOJA =====
+        // Verifica se a loja existe e pertence ao vendedor logado
+        var store = await _context.Stores
+            .FirstOrDefaultAsync(s => s.Id == storeId && s.VendorId == vendorId);
+
+        if (store == null)
+        {
+            _logger.LogWarning($"Tentativa de acessar loja inexistente ou não autorizada. StoreId: {storeId}, VendorId: {vendorId}");
+            TempData["ErrorMessage"] = "Loja não encontrada ou você não tem permissão para acessá-la.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // ===== BUSCAR PRODUTOS DA LOJA =====
+        var products = await _context.Products
+            .Include(p => p.Category)
+            .Where(p => p.StoreId == storeId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+
+        _logger.LogInformation($"Vendedor {vendorId} acessando produtos da loja '{store.Name}' (ID: {storeId}). Total: {products.Count} produtos");
+
+        // ===== MONTAR O VIEWMODEL =====
+        var viewModel = new ManageProductsViewModel
+        {
+            StoreId = store.Id,
+            StoreName = store.Name,
+            StoreDescription = store.Description,
+            StoreLogoUrl = store.LogoUrl,
+            Products = products
+        };
+
+        return View(viewModel);
+    }
+
+    // ===== ACTION: CRIAR NOVO PRODUTO (GET) =====
+
+    /// <summary>
+    /// Exibe o formulário para criar um novo produto.
+    ///
+    /// URL: /Vendor/CreateProduct?storeId=1
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> CreateProduct(int storeId)
+    {
+        // ===== IDENTIFICAR O VENDEDOR =====
+        var vendorId = _userManager.GetUserId(User);
+
+        if (string.IsNullOrEmpty(vendorId))
+        {
+            _logger.LogWarning("Tentativa de criar produto sem usuário autenticado");
+            return RedirectToAction("Login", "Account");
+        }
+
+        // ===== VERIFICAR SE A LOJA EXISTE E PERTENCE AO VENDEDOR =====
+        var store = await _context.Stores
+            .FirstOrDefaultAsync(s => s.Id == storeId && s.VendorId == vendorId);
+
+        if (store == null)
+        {
+            _logger.LogWarning($"Tentativa de criar produto em loja inexistente ou não autorizada. StoreId: {storeId}, VendorId: {vendorId}");
+            TempData["ErrorMessage"] = "Loja não encontrada ou você não tem permissão para adicionar produtos.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // ===== BUSCAR CATEGORIAS ATIVAS =====
+        var categories = await _context.Categories
+            .Where(c => c.IsActive)
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+
+        // Passar as categorias para a view via ViewBag
+        ViewBag.Categories = categories;
+        ViewBag.StoreName = store.Name;
+
+        // Criar ViewModel com StoreId já preenchido
+        var viewModel = new CreateProductViewModel
+        {
+            StoreId = storeId,
+            Status = ProductStatus.Available
+        };
+
+        return View(viewModel);
+    }
+
+    // ===== ACTION: CRIAR NOVO PRODUTO (POST) =====
+
+    /// <summary>
+    /// Processa o formulário de criação de produto.
+    ///
+    /// Fluxo:
+    /// 1. Valida os dados do formulário
+    /// 2. Verifica se a loja existe e pertence ao vendedor
+    /// 3. Verifica se já existe produto com o mesmo SKU na loja
+    /// 4. Cria o produto no banco
+    /// 5. Redireciona para a página de gerenciamento de produtos
+    ///
+    /// URL: /Vendor/CreateProduct (POST)
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateProduct(CreateProductViewModel model)
+    {
+        // ===== VALIDAÇÃO =====
+        if (!ModelState.IsValid)
+        {
+            // Recarregar categorias para o formulário
+            var categoriesForView = await _context.Categories
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            ViewBag.Categories = categoriesForView;
+
+            var storeForView = await _context.Stores
+                .FirstOrDefaultAsync(s => s.Id == model.StoreId);
+            ViewBag.StoreName = storeForView?.Name ?? "Loja";
+
+            return View(model);
+        }
+
+        try
+        {
+            // ===== IDENTIFICAR O VENDEDOR =====
+            var vendorId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(vendorId))
+            {
+                _logger.LogError("Tentativa de criar produto sem usuário autenticado");
+                ModelState.AddModelError(string.Empty, "Erro de autenticação. Faça login novamente.");
+                return View(model);
+            }
+
+            // ===== VERIFICAR SE A LOJA EXISTE E PERTENCE AO VENDEDOR =====
+            var store = await _context.Stores
+                .FirstOrDefaultAsync(s => s.Id == model.StoreId && s.VendorId == vendorId);
+
+            if (store == null)
+            {
+                _logger.LogWarning($"Tentativa de criar produto em loja inexistente ou não autorizada. StoreId: {model.StoreId}, VendorId: {vendorId}");
+                ModelState.AddModelError(string.Empty, "Loja não encontrada ou você não tem permissão.");
+                return View(model);
+            }
+
+            // ===== VERIFICAR SE JÁ EXISTE PRODUTO COM O MESMO SKU NA LOJA =====
+            var existingProduct = await _context.Products
+                .FirstOrDefaultAsync(p => p.StoreId == model.StoreId && p.SKU == model.SKU);
+
+            if (existingProduct != null)
+            {
+                _logger.LogWarning($"Tentativa de criar produto com SKU duplicado: {model.SKU} na loja {model.StoreId}");
+                ModelState.AddModelError("SKU", "Já existe um produto com este SKU nesta loja.");
+
+                // Recarregar categorias
+                var categoriesForView = await _context.Categories
+                    .Where(c => c.IsActive)
+                    .OrderBy(c => c.Name)
+                    .ToListAsync();
+                ViewBag.Categories = categoriesForView;
+                ViewBag.StoreName = store.Name;
+
+                return View(model);
+            }
+
+            // ===== CRIAR O PRODUTO =====
+            var product = new Product
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                Stock = model.Stock,
+                SKU = model.SKU,
+                ImageUrl = model.ImageUrl,
+                CategoryId = model.CategoryId,
+                Status = model.Status,
+                StoreId = model.StoreId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
+            };
+
+            // ===== SALVAR NO BANCO =====
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Novo produto criado: '{product.Name}' (ID: {product.Id}) na loja '{store.Name}' (ID: {store.Id})");
+
+            // ===== MENSAGEM DE SUCESSO =====
+            TempData["SuccessMessage"] = $"Produto '{product.Name}' criado com sucesso!";
+
+            // ===== REDIRECIONAR =====
+            return RedirectToAction(nameof(ManageProducts), new { storeId = model.StoreId });
+        }
+        catch (Exception ex)
+        {
+            // ===== TRATAMENTO DE ERROS =====
+            _logger.LogError(ex, "Erro ao criar produto");
+            ModelState.AddModelError(string.Empty, "Erro ao criar produto. Tente novamente.");
+
+            // Recarregar categorias
+            var categoriesForView = await _context.Categories
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+            ViewBag.Categories = categoriesForView;
+
+            var storeForView = await _context.Stores
+                .FirstOrDefaultAsync(s => s.Id == model.StoreId);
+            ViewBag.StoreName = storeForView?.Name ?? "Loja";
+
+            return View(model);
+        }
+    }
 }
