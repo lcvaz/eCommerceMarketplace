@@ -94,7 +94,7 @@ public class AccountController : Controller // Importa Controller de Mvc
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         if (!ModelState.IsValid)
         {
@@ -112,32 +112,38 @@ public class AccountController : Controller // Importa Controller de Mvc
         {
             // Buscar o usuário para verificar a role
             var user = await _userManager.FindByEmailAsync(model.Email);
-            
+
             if (user != null)
             {
+                // Se existe returnUrl válido e local, redireciona para lá
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+
                 // Verificar se é Admin
                 if (await _userManager.IsInRoleAsync(user, "Admin"))
                 {
                     return RedirectToAction("Index", "Admin");  // Dashboard Admin
                 }
-                
+
                 // Verificar se é Vendedor
                 if (await _userManager.IsInRoleAsync(user, "Vendedor"))
                 {
                     return RedirectToAction("Dashboard", "Vendor");  // Dashboard Vendedor
                 }
-                
+
                 // Se não é Admin nem Vendedor, é Cliente
                 return RedirectToAction("Index", "Home");  // Home/Dashboard Cliente
             }
-            
+
             // Fallback: se não encontrou usuário (improvável)
             return RedirectToAction("Index", "Home");
         }
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, 
+            ModelState.AddModelError(string.Empty,
                 "Conta bloqueada por excesso de tentativas. Tente novamente em 5 minutos.");
             return View(model);
         }
@@ -149,8 +155,9 @@ public class AccountController : Controller // Importa Controller de Mvc
 
 
     [HttpGet]
-    public IActionResult Login()
+    public IActionResult Login(string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 

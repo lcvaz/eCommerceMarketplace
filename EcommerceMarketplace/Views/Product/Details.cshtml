@@ -108,12 +108,41 @@
             <!-- Botão Adicionar ao Carrinho -->
             @if (Model.IsAvailable)
             {
-                <div class="d-grid gap-2 mb-3">
-                    <button type="button" class="btn btn-dark btn-lg" onclick="alert('Funcionalidade de carrinho será implementada em breve!')">
-                        <i class="bi bi-cart-plus me-2"></i>
-                        Adicionar ao Carrinho
-                    </button>
-                </div>
+                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    
+                    <!-- Seletor de Quantidade -->
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label fw-bold">Quantidade</label>
+                        <div class="input-group" style="max-width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" 
+                                class="form-control text-center" 
+                                id="quantity" 
+                                name="quantity" 
+                                value="1" 
+                                min="1" 
+                                max="@Model.Stock"
+                                required />
+                            <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity(@Model.Stock)">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Máximo: @Model.Stock unidades</small>
+                    </div>
+                    
+                    <!-- Botão Adicionar -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-dark btn-lg">
+                            <i class="bi bi-cart-plus me-2"></i>
+                            Adicionar ao Carrinho
+                        </button>
+                    </div>
+                    
+                    @Html.AntiForgeryToken()
+                </form>
             }
             else
             {
@@ -229,4 +258,8 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/product-details.js" asp-append-version="true"></script>
 }

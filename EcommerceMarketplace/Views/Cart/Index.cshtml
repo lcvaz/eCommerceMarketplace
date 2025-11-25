@@ -1,0 +1,223 @@
+@model CartViewModel
+
+@{
+    ViewData["Title"] = "Carrinho de Compras";
+}
+
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Início</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Carrinho</li>
+        </ol>
+    </nav>
+    
+    <h1 class="mb-4">Carrinho de Compras</h1>
+    
+    @* Mensagens de sucesso/erro *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (Model.IsEmpty)
+    {
+        <!-- Carrinho Vazio -->
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x" style="font-size: 5rem; color: #ccc;"></i>
+            <h3 class="mt-3">Seu carrinho está vazio</h3>
+            <p class="text-muted mb-4">Adicione produtos para começar suas compras</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-dark">
+                <i class="bi bi-shop me-2"></i>
+                Continuar Comprando
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Coluna dos Itens -->
+            <div class="col-lg-8">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Imagem do Produto -->
+                                <div class="col-md-3">
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId">
+                                        @if (!string.IsNullOrEmpty(item.ProductImageUrl))
+                                        {
+                                            <img src="@item.ProductImageUrl" alt="@item.ProductName" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                                            </div>
+                                        }
+                                    </a>
+                                </div>
+                                
+                                <!-- Informações do Produto -->
+                                <div class="col-md-6">
+                                    <h5 class="card-title">
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none text-dark">
+                                            @item.ProductName
+                                        </a>
+                                    </h5>
+                                    <p class="text-muted mb-2">
+                                        <small>
+                                            <i class="bi bi-shop me-1"></i>
+                                            @item.StoreName
+                                        </small>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Preço unitário:</strong> 
+                                        @item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                    </p>
+                                    
+                                    <!-- Aviso de Estoque -->
+                                    @if (!string.IsNullOrEmpty(item.StockWarning))
+                                    {
+                                        <div class="alert alert-warning py-2 mb-2" role="alert">
+                                            <small>
+                                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                                @item.StockWarning
+                                            </small>
+                                        </div>
+                                    }
+                                    
+                                    <!-- Controle de Quantidade -->
+                                    <div class="d-flex align-items-center">
+                                        <label class="me-2 mb-0"><small>Quantidade:</small></label>
+                                        <div class="input-group" style="max-width: 150px;">
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" onclick="updateQuantity(@item.CartItemId, @(item.Quantity - 1))">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control form-control-sm text-center" 
+                                                   id="quantity-@item.CartItemId" 
+                                                   value="@item.Quantity" 
+                                                   min="1" 
+                                                   max="@item.AvailableStock"
+                                                   readonly />
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" onclick="updateQuantity(@item.CartItemId, @(item.Quantity + 1))">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subtotal e Remover -->
+                                <div class="col-md-3 text-end">
+                                    <h5 class="mb-3" id="subtotal-@item.CartItemId">
+                                        @item.Subtotal.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                    </h5>
+                                    <form asp-controller="Cart" asp-action="RemoveItem" method="post" class="d-inline">
+                                        <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" >
+                                            <i class="bi bi-trash me-1"></i>
+                                            Remover
+                                        </button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-between mt-3">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Continuar Comprando
+                    </a>
+                    
+                    <form asp-controller="Cart" asp-action="Clear" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger" >
+                            <i class="bi bi-trash me-2"></i>
+                            Limpar Carrinho
+                        </button>
+                        @Html.AntiForgeryToken()
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Coluna do Resumo -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Resumo do Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal (@Model.TotalItems itens)</span>
+                            <strong id="cart-subtotal">@Model.Subtotal.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Frete</span>
+                            <strong>@Model.ShippingCost.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+                        @if (Model.Discount > 0)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Desconto</span>
+                                <strong>-@Model.Discount.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                            </div>
+                        }
+                        <hr />
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Total</h5>
+                            <h5 class="text-success" id="cart-total">@Model.Total.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</h5>
+                        </div>
+                        
+                        <!-- Botão de Finalizar Compra -->
+                        <div class="d-grid">
+                            <button class="btn btn-success btn-lg" onclick="alert('Funcionalidade de checkout será implementada em breve!')">
+                                <i class="bi bi-credit-card me-2"></i>
+                                Finalizar Compra
+                            </button>
+                        </div>
+                        
+                        <!-- Badge de Segurança -->
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Compra 100% segura
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card de Frete Grátis -->
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-truck text-success" style="font-size: 2rem;"></i>
+                        <p class="mb-0 mt-2"><strong>Frete Grátis</strong></p>
+                        <small class="text-muted">Para todo o Brasil</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+}

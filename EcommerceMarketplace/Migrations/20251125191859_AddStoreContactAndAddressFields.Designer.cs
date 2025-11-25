@@ -3,6 +3,7 @@ using System;
 using EcommerceMarketplace.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EcommerceMarketplace.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125191859_AddStoreContactAndAddressFields")]
+    partial class AddStoreContactAndAddressFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,15 +50,37 @@ namespace EcommerceMarketplace.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Neighborhood")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -67,15 +92,14 @@ namespace EcommerceMarketplace.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("ZipCode")
                         .IsRequired()
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("ZipCode");
 
@@ -260,36 +284,6 @@ namespace EcommerceMarketplace.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("EcommerceMarketplace.Models.CustomerAddress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AddressId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AddressId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("CustomerAddresses");
                 });
 
             modelBuilder.Entity("EcommerceMarketplace.Models.Order", b =>
@@ -628,12 +622,19 @@ namespace EcommerceMarketplace.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("CNPJ")
                         .HasMaxLength(18)
                         .HasColumnType("character varying(18)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ContactEmail")
                         .HasMaxLength(100)
@@ -658,6 +659,11 @@ namespace EcommerceMarketplace.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -668,9 +674,12 @@ namespace EcommerceMarketplace.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("character varying(9)");
 
-                    b.HasIndex("AddressId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CNPJ");
 
@@ -811,6 +820,17 @@ namespace EcommerceMarketplace.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("EcommerceMarketplace.Models.Address", b =>
+                {
+                    b.HasOne("EcommerceMarketplace.Models.ApplicationUser", "Customer")
+                        .WithMany("Addresses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("EcommerceMarketplace.Models.Cart", b =>
                 {
                     b.HasOne("EcommerceMarketplace.Models.ApplicationUser", "Customer")
@@ -849,25 +869,6 @@ namespace EcommerceMarketplace.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
-                });
-
-            modelBuilder.Entity("EcommerceMarketplace.Models.CustomerAddress", b =>
-                {
-                    b.HasOne("EcommerceMarketplace.Models.Address", "Address")
-                        .WithMany("CustomerAddresses")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EcommerceMarketplace.Models.ApplicationUser", "Customer")
-                        .WithMany("CustomerAddresses")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Address");
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("EcommerceMarketplace.Models.Order", b =>
@@ -977,19 +978,11 @@ namespace EcommerceMarketplace.Migrations
 
             modelBuilder.Entity("EcommerceMarketplace.Models.Store", b =>
                 {
-                    b.HasOne("EcommerceMarketplace.Models.Address", "Address")
-                        .WithMany("Stores")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("EcommerceMarketplace.Models.ApplicationUser", "Vendor")
                         .WithMany("Stores")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Address");
 
                     b.Navigation("Vendor");
                 });
@@ -1047,18 +1040,14 @@ namespace EcommerceMarketplace.Migrations
 
             modelBuilder.Entity("EcommerceMarketplace.Models.Address", b =>
                 {
-                    b.Navigation("CustomerAddresses");
-
                     b.Navigation("Orders");
-
-                    b.Navigation("Stores");
                 });
 
             modelBuilder.Entity("EcommerceMarketplace.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("Cart");
+                    b.Navigation("Addresses");
 
-                    b.Navigation("CustomerAddresses");
+                    b.Navigation("Cart");
 
                     b.Navigation("Orders");
 

@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EcommerceMarketplace</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> 
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" /> 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EcommerceMarketplace.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">  
 
     @RenderSection("Styles", required: false)
 </head>
@@ -31,9 +31,30 @@
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <!-- Menu Principal -->
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Início</a>
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Vendedor"))
+                        {
+                            @* Botão para Dashboard do Vendedor *@
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Vendor" ? "active" : "")" 
+                                asp-controller="Vendor" 
+                                asp-action="Dashboard">
+                                    <i class="bi bi-speedometer2 me-1"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                        }
+                        <!--else
+                        {
+                            @* Botão normal de Início para clientes e visitantes *@
+                            <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" ? "active" : "")" 
+                            asp-controller="Product" 
+                            asp-action="Index">
+                                <i class="bi bi-shop me-1"></i>
+                                Início
+                            </a>
                         </li>
+                        }-->
                         <li class="nav-item">
                             <a class="nav-link" href="#">Loja</a>
                         </li>
@@ -55,6 +76,9 @@
                                 <input class="form-control border-start-0" type="search" placeholder="Buscar" aria-label="Buscar">
                             </div>
                         </form>
+
+                        <!-- Carrinho - usando ViewComponent -->
+                        @await Component.InvokeAsync("CartBadge")
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
