@@ -26,14 +26,6 @@ public class Address
     public string RecipientName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Telefone para contato de entrega
-    /// </summary>
-    [Required]
-    [StringLength(15)]
-    [Phone(ErrorMessage = "Telefone inválido")]
-    public string Phone { get; set; } = string.Empty;
-
-    /// <summary>
     /// CEP - Código de Endereçamento Postal
     /// Formato: 00000-000
     /// </summary>

@@ -324,17 +324,16 @@ public class VendorController : Controller
                 City = model.City,
                 State = model.State,
                 ZipCode = model.ZipCode,
-
+                
                 // Associar ao vendedor logado
-                VendorId = vendorId,                  // ✅ Propriedade correta: VendorId
-
+                VendorId = vendorId,
+                
                 // Valores padrão/iniciais
                 Status = StoreStatus.Active,          // Loja começa ativa
+                //AverageRating = 0,                    // Sem avaliações ainda
+                //TotalReviews = 0,                     // Sem avaliações ainda
                 CreatedAt = DateTime.UtcNow,          // Data/hora da criação
-                UpdatedAt = DateTime.UtcNow           // Mesma data/hora inicialmente
-
-                // NOTA: AverageRating e TotalReviews são propriedades CALCULADAS automaticamente
-                // com base nas reviews. Não podem ser atribuídas manualmente.
+                //UpdatedAt = DateTime.UtcNow           // Mesma data/hora inicialmente
             };
             
             // ===== SALVAR NO BANCO =====
