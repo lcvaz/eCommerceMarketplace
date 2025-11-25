@@ -81,7 +81,70 @@ namespace EcommerceMarketplace.Migrations
                 nullable: false,
                 defaultValue: DateTime.UtcNow);
 
-            // ===== PASSO 4: Remover campos de endereço direto da tabela Stores =====
+            // ===== PASSO 4: Adicionar AddressId à tabela Stores (nullable temporariamente) =====
+            migrationBuilder.AddColumn<int>(
+                name: "AddressId",
+                table: "Stores",
+                type: "integer",
+                nullable: true);
+
+            // ===== PASSO 5: Migrar dados existentes - Criar endereços para lojas existentes =====
+            // Cria uma tabela temporária para mapear Store -> Address
+            migrationBuilder.Sql(@"
+                CREATE TEMP TABLE temp_store_addresses AS
+                SELECT
+                    ""Id"" as store_id,
+                    COALESCE(""Address"", 'Não informado') as street,
+                    'S/N' as number,
+                    'Centro' as neighborhood,
+                    COALESCE(""City"", 'Não informado') as city,
+                    COALESCE(""State"", 'XX') as state,
+                    COALESCE(""ZipCode"", '00000-000') as zipcode
+                FROM ""Stores"";
+            ");
+
+            // Insere endereços únicos na tabela Addresses
+            migrationBuilder.Sql(@"
+                INSERT INTO ""Addresses"" (""Street"", ""Number"", ""Neighborhood"", ""City"", ""State"", ""ZipCode"", ""CreatedAt"", ""UpdatedAt"")
+                SELECT DISTINCT
+                    street,
+                    number,
+                    neighborhood,
+                    city,
+                    state,
+                    zipcode,
+                    CURRENT_TIMESTAMP,
+                    CURRENT_TIMESTAMP
+                FROM temp_store_addresses;
+            ");
+
+            // ===== PASSO 6: Atualizar AddressId nas lojas com base nos endereços criados =====
+            migrationBuilder.Sql(@"
+                UPDATE ""Stores"" s
+                SET ""AddressId"" = a.""Id""
+                FROM ""Addresses"" a, temp_store_addresses t
+                WHERE s.""Id"" = t.store_id
+                  AND a.""Street"" = t.street
+                  AND a.""City"" = t.city
+                  AND a.""State"" = t.state
+                  AND a.""ZipCode"" = t.zipcode;
+            ");
+
+            // Remove a tabela temporária
+            migrationBuilder.Sql(@"DROP TABLE temp_store_addresses;");
+
+            // ===== PASSO 7: Tornar AddressId obrigatório =====
+            migrationBuilder.AlterColumn<int>(
+                name: "AddressId",
+                table: "Stores",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0,
+                oldClrType: typeof(int),
+                oldType: "integer",
+                oldNullable: true);
+
+            // ===== PASSO 8: Remover campos de endereço direto da tabela Stores =====
             migrationBuilder.DropColumn(
                 name: "Address",
                 table: "Stores");
@@ -98,15 +161,7 @@ namespace EcommerceMarketplace.Migrations
                 name: "ZipCode",
                 table: "Stores");
 
-            // ===== PASSO 5: Adicionar AddressId à tabela Stores =====
-            migrationBuilder.AddColumn<int>(
-                name: "AddressId",
-                table: "Stores",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0);
-
-            // ===== PASSO 6: Criar tabela CustomerAddresses (junction table) =====
+            // ===== PASSO 9: Criar tabela CustomerAddresses (junction table) =====
             migrationBuilder.CreateTable(
                 name: "CustomerAddresses",
                 columns: table => new
@@ -135,7 +190,7 @@ namespace EcommerceMarketplace.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            // ===== PASSO 7: Criar índices para CustomerAddresses =====
+            // ===== PASSO 10: Criar índices para CustomerAddresses =====
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerAddresses_AddressId",
                 table: "CustomerAddresses",
@@ -146,7 +201,7 @@ namespace EcommerceMarketplace.Migrations
                 table: "CustomerAddresses",
                 column: "CustomerId");
 
-            // ===== PASSO 8: Criar foreign key de Store para Address =====
+            // ===== PASSO 11: Criar foreign key de Store para Address =====
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_AddressId",
                 table: "Stores",
