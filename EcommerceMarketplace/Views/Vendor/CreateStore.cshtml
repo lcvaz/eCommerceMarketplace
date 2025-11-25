@@ -52,12 +52,12 @@
                         method="post" = este formulário usa POST
                     *@
                     <form asp-action="CreateStore" method="post">
-                        
-                        @* 
+
+                        @*
                             Token anti-forgery para segurança.
                             Previne ataques CSRF (Cross-Site Request Forgery)
                         *@
-                        <input type="hidden" asp-for="@Html.AntiForgeryToken()" />
+                        @Html.AntiForgeryToken()
                         
                         @* 
                             Mostra um resumo de todos os erros de validação no topo do formulário.
