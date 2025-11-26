@@ -1,0 +1,67 @@
+@{
+    ViewData["Title"] = "Link Expirado";
+}
+
+<!--
+    VIEW - LINK DE CONFIRMAÇÃO EXPIRADO
+
+    Exibida quando o cliente tenta usar um link que expirou (24 horas).
+
+    DADOS RECEBIDOS VIA VIEWBAG:
+    - ViewBag.ErrorMessage: Mensagem com data de expiração
+    - ViewBag.OrderNumber: Número do pedido
+-->
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Ícone de Expirado -->
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="bi bi-clock-history text-warning" style="font-size: 6rem;"></i>
+                </div>
+                <h1 class="display-5 mb-3">Link de Confirmação Expirado</h1>
+                <p class="lead text-muted">@ViewBag.ErrorMessage</p>
+            </div>
+
+            <!-- Card com Instruções -->
+            <div class="card bg-warning bg-opacity-10 border-warning mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>O que fazer?
+                    </h5>
+                    <p class="mb-2">
+                        <strong>Pedido:</strong> @ViewBag.OrderNumber
+                    </p>
+                    <p class="mb-0">
+                        Entre em contato com nosso suporte informando o número do pedido acima.
+                        Vamos gerar um novo link de confirmação para você.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card com Contato -->
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-headset me-2"></i>Suporte
+                    </h5>
+                    <ul class="mb-0">
+                        <li>Email: suporte@marketplace.com</li>
+                        <li>WhatsApp: (11) 99999-9999</li>
+                        <li>Horário: Segunda a Sexta, 9h às 18h</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botão de Voltar -->
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-dark btn-lg">
+                    <i class="bi bi-house-door me-2"></i>Voltar ao Início
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

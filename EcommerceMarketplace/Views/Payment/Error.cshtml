@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Erro na Confirmação";
+}
+
+<!--
+    VIEW DE ERRO GENÉRICO
+
+    Exibida quando ocorre um erro durante a confirmação de pagamento.
+
+    DADOS RECEBIDOS VIA VIEWBAG:
+    - ViewBag.ErrorTitle: Título do erro
+    - ViewBag.ErrorMessage: Mensagem detalhada do erro
+-->
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Ícone de Erro -->
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 6rem;"></i>
+                </div>
+                <h1 class="display-5 mb-3">@ViewBag.ErrorTitle</h1>
+                <p class="lead text-muted">@ViewBag.ErrorMessage</p>
+            </div>
+
+            <!-- Card com Informações de Contato -->
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-headset me-2"></i>Precisa de Ajuda?
+                    </h5>
+                    <p class="mb-2">
+                        Se você continuar tendo problemas, nossa equipe de suporte está pronta para ajudar:
+                    </p>
+                    <ul class="mb-0">
+                        <li>Email: suporte@marketplace.com</li>
+                        <li>WhatsApp: (11) 99999-9999</li>
+                        <li>Horário: Segunda a Sexta, 9h às 18h</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botão de Voltar -->
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-dark btn-lg">
+                    <i class="bi bi-house-door me-2"></i>Voltar ao Início
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
