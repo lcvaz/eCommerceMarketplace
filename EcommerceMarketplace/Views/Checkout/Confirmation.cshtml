@@ -1,0 +1,266 @@
+@model Order
+
+@{
+    ViewData["Title"] = "Pedido Confirmado";
+}
+
+<div class="container my-5">
+    <!-- Mensagem de Sucesso -->
+    <div class="text-center mb-5">
+        <div class="mb-3">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+        </div>
+        <h1 class="mb-3">Pedido Confirmado!</h1>
+        <p class="lead text-muted">Obrigado por comprar conosco. Seu pedido foi recebido com sucesso.</p>
+    </div>
+
+    <div class="row">
+        <!-- Coluna Principal -->
+        <div class="col-lg-8 mx-auto">
+            <!-- Informações do Pedido -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-1">Número do Pedido</h6>
+                            <p class="mb-0"><strong>@Model.OrderNumber</strong></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-1">Data</h6>
+                            <p class="mb-0"><strong>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</strong></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-1">Status</h6>
+                            <p class="mb-0">
+                                <span class="badge bg-warning">
+                                    @(Model.Status == OrderStatus.Pending ? "Aguardando Pagamento" : Model.Status.ToString())
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted mb-1">Forma de Pagamento</h6>
+                            <p class="mb-0"><strong>@Model.PaymentMethod</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Instruções de Pagamento *@
+            @if (Model.PaymentMethod == "PIX")
+            {
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-phone me-2"></i>
+                        Instruções para Pagamento via PIX
+                    </h5>
+                    <hr />
+                    <p>1. Abra o aplicativo do seu banco</p>
+                    <p>2. Escolha a opção Pix</p>
+                    <p>3. Escaneie o QR Code ou copie o código abaixo</p>
+                    <p class="mb-0">4. Confirme o pagamento de <strong>@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></p>
+                    <div class="text-center my-3">
+                        <div class="bg-white p-3 d-inline-block rounded">
+                            <i class="bi bi-qr-code" style="font-size: 8rem;"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="00020126330014BR.GOV.BCB.PIX..." readonly id="pixCode" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyPixCode()">
+                            <i class="bi bi-clipboard"></i> Copiar
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">O código PIX expira em 24 horas</small>
+                </div>
+            }
+
+            @if (Model.PaymentMethod == "Boleto Bancário")
+            {
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-upc-scan me-2"></i>
+                        Instruções para Pagamento via Boleto
+                    </h5>
+                    <hr />
+                    <p>1. Imprima ou copie o código de barras abaixo</p>
+                    <p>2. Pague em qualquer banco, lotérica ou app bancário</p>
+                    <p class="mb-3">3. O prazo de vencimento é de 3 dias úteis</p>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" value="34191.79001 01043.510047 91020.150008 1 89370000014500" readonly id="boletoCode" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyBoletoCode()">
+                            <i class="bi bi-clipboard"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" type="button">
+                            <i class="bi bi-printer me-2"></i>
+                            Imprimir Boleto
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Após o pagamento, o pedido será processado em até 2 dias úteis</small>
+                </div>
+            }
+
+            @if (Model.PaymentMethod == "Cartão de Crédito")
+            {
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <strong>Pagamento aprovado!</strong> Seu pedido já está sendo processado.
+                </div>
+            }
+
+            <!-- Itens do Pedido -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Itens do Pedido (@Model.TotalItems itens)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex">
+                                    <img src="@(item.Product.ImageUrl ?? "/images/placeholder.jpg")"
+                                         alt="@item.Product.Name"
+                                         class="rounded me-3"
+                                         style="width: 80px; height: 80px; object-fit: cover;" />
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">@item.Product.Name</h6>
+                                        <p class="mb-1 text-muted">
+                                            <small>Quantidade: @item.Quantity</small>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>@item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="mb-0">
+                                            <strong>@item.Subtotal.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endereço de Entrega -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-truck me-2"></i>
+                        Endereço de Entrega
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">@Model.ShippingAddress.Street, @Model.ShippingAddress.Number</p>
+                    @if (!string.IsNullOrEmpty(Model.ShippingAddress.Complement))
+                    {
+                        <p class="mb-1">@Model.ShippingAddress.Complement</p>
+                    }
+                    <p class="mb-1">@Model.ShippingAddress.Neighborhood</p>
+                    <p class="mb-1">@Model.ShippingAddress.City - @Model.ShippingAddress.State</p>
+                    <p class="mb-0">CEP: @Model.ShippingAddress.ZipCode</p>
+                </div>
+            </div>
+
+            <!-- Resumo de Valores -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <strong>@Model.SubtotalAmount.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Frete</span>
+                        <strong class="text-success">
+                            @(Model.ShippingAmount == 0 ? "Grátis" : Model.ShippingAmount.ToString("C", new System.Globalization.CultureInfo("pt-BR")))
+                        </strong>
+                    </div>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Desconto</span>
+                            <strong>-@Model.DiscountAmount.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+                    }
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <h5>Total</h5>
+                        <h5 class="text-success">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="d-flex gap-2 justify-content-center mb-5">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark">
+                    <i class="bi bi-shop me-2"></i>
+                    Continuar Comprando
+                </a>
+                <a asp-controller="Order" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-dark">
+                    <i class="bi bi-receipt me-2"></i>
+                    Ver Detalhes do Pedido
+                </a>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="alert alert-light" role="alert">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Próximos Passos
+                </h6>
+                <ul class="mb-0">
+                    <li>Você receberá um e-mail de confirmação com os detalhes do pedido</li>
+                    <li>Acompanhe o status do seu pedido na área "Meus Pedidos"</li>
+                    <li>Após a confirmação do pagamento, seu pedido será enviado em até 2 dias úteis</li>
+                    <li>Você receberá o código de rastreamento quando o pedido for enviado</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode');
+            pixCode.select();
+            pixCode.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(pixCode.value);
+
+            // Mostrar feedback
+            const button = event.target.closest('button');
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copiado!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-secondary');
+
+            setTimeout(() => {
+                button.innerHTML = originalHtml;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+
+        function copyBoletoCode() {
+            const boletoCode = document.getElementById('boletoCode');
+            boletoCode.select();
+            boletoCode.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(boletoCode.value);
+
+            // Mostrar feedback
+            const button = event.target.closest('button');
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copiado!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-secondary');
+
+            setTimeout(() => {
+                button.innerHTML = originalHtml;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+    </script>
+}
