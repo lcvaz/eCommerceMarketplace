@@ -1,0 +1,385 @@
+@model CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Finalizar Compra";
+}
+
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Início</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index">Carrinho</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Finalizar Compra</li>
+        </ol>
+    </nav>
+
+    <!-- Título e Botão Voltar -->
+    <div class="d-flex align-items-center mb-4">
+        <a asp-controller="Cart" asp-action="Index" class="btn btn-link text-dark p-0 me-3" style="font-size: 1.5rem;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="mb-0">Finalizar Compra</h1>
+    </div>
+
+    @* Mensagens de sucesso/erro *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form asp-controller="Checkout" asp-action="ProcessCheckout" method="post">
+        <div class="row">
+            <!-- Coluna Esquerda: Formulário -->
+            <div class="col-lg-8">
+                <!-- Dados Pessoais -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Dados Pessoais</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FullName" class="form-label"></label>
+                                <input asp-for="FullName" class="form-control" placeholder="João Silva" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" placeholder="joao@email.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label"></label>
+                                <input asp-for="Phone" class="form-control" placeholder="(11) 99999-9999" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CPF" class="form-label"></label>
+                                <input asp-for="CPF" class="form-control" placeholder="000.000.000-00" />
+                                <span asp-validation-for="CPF" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço de Entrega -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Endereço de Entrega</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ZipCode" class="form-label"></label>
+                                <input asp-for="ZipCode" class="form-control" placeholder="00000-000" />
+                                <span asp-validation-for="ZipCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Street" class="form-label"></label>
+                                <input asp-for="Street" class="form-control" placeholder="Rua das Flores" />
+                                <span asp-validation-for="Street" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Number" class="form-label"></label>
+                                <input asp-for="Number" class="form-control" placeholder="123" />
+                                <span asp-validation-for="Number" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Complement" class="form-label"></label>
+                                <input asp-for="Complement" class="form-control" placeholder="Apto 45" />
+                                <span asp-validation-for="Complement" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label asp-for="Neighborhood" class="form-label"></label>
+                                <input asp-for="Neighborhood" class="form-control" placeholder="Centro" />
+                                <span asp-validation-for="Neighborhood" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label asp-for="City" class="form-label"></label>
+                                <input asp-for="City" class="form-control" placeholder="São Paulo" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label asp-for="State" class="form-label"></label>
+                                <select asp-for="State" class="form-select">
+                                    <option value="">UF</option>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="SaveAddress" class="form-check-input" type="checkbox" />
+                            <label asp-for="SaveAddress" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forma de Pagamento -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Forma de Pagamento</h5>
+
+                        <!-- Opção: Cartão de Crédito -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="CreditCard" id="paymentCreditCard" checked />
+                            <label class="form-check-label d-flex align-items-center" for="paymentCreditCard">
+                                <i class="bi bi-credit-card me-2"></i>
+                                <div>
+                                    <strong>Cartão de Crédito</strong>
+                                    <br />
+                                    <small class="text-muted">Em até 12x sem juros</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Campos do Cartão de Crédito -->
+                        <div id="creditCardFields" class="ms-4 mb-3">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label asp-for="CardNumber" class="form-label"></label>
+                                    <input asp-for="CardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" />
+                                    <span asp-validation-for="CardNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label asp-for="CardHolderName" class="form-label"></label>
+                                    <input asp-for="CardHolderName" class="form-control" placeholder="JOÃO SILVA" style="text-transform: uppercase;" />
+                                    <span asp-validation-for="CardHolderName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CardExpiry" class="form-label"></label>
+                                    <input asp-for="CardExpiry" class="form-control" placeholder="MM/AA" maxlength="5" />
+                                    <span asp-validation-for="CardExpiry" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CardCVV" class="form-label"></label>
+                                    <input asp-for="CardCVV" class="form-control" placeholder="123" maxlength="4" />
+                                    <span asp-validation-for="CardCVV" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opção: PIX -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="PIX" id="paymentPIX" />
+                            <label class="form-check-label d-flex align-items-center" for="paymentPIX">
+                                <i class="bi bi-phone me-2"></i>
+                                <div>
+                                    <strong>PIX</strong>
+                                    <br />
+                                    <small class="text-muted">Aprovação imediata</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Opção: Boleto Bancário -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="BankSlip" id="paymentBankSlip" />
+                            <label class="form-check-label d-flex align-items-center" for="paymentBankSlip">
+                                <i class="bi bi-upc-scan me-2"></i>
+                                <div>
+                                    <strong>Boleto Bancário</strong>
+                                    <br />
+                                    <small class="text-muted">Vencimento em 3 dias úteis</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Resumo do Pedido -->
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Resumo do Pedido</h5>
+
+                        <!-- Lista de Produtos -->
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="d-flex mb-3">
+                                <img src="@item.ProductImageUrl" alt="@item.ProductName" class="rounded me-2" style="width: 60px; height: 60px; object-fit: cover;" />
+                                <div class="flex-grow-1">
+                                    <p class="mb-0" style="font-size: 0.9rem;"><strong>@item.ProductName</strong></p>
+                                    <p class="mb-0 text-muted" style="font-size: 0.85rem;">Qtd: @item.Quantity</p>
+                                    <p class="mb-0" style="font-size: 0.9rem;">@item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</p>
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <!-- Valores -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <strong>@Model.Subtotal.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Frete</span>
+                            <strong class="text-success">Grátis</strong>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Total</h5>
+                            <h5 class="text-dark">@Model.Total.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</h5>
+                        </div>
+
+                        <p class="text-muted mb-3" style="font-size: 0.85rem;">
+                            ou 12x de @((Model.Total / 12).ToString("C", new System.Globalization.CultureInfo("pt-BR"))) sem juros
+                        </p>
+
+                        <!-- Botão Finalizar Compra -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark btn-lg">
+                                Finalizar Compra
+                            </button>
+                        </div>
+
+                        <p class="text-center text-muted mt-3 mb-0" style="font-size: 0.85rem;">
+                            Ao finalizar a compra, você concorda com nossos termos e condições
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @Html.AntiForgeryToken()
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Mostrar/ocultar campos do cartão baseado na forma de pagamento
+        document.addEventListener('DOMContentLoaded', function() {
+            const creditCardRadio = document.getElementById('paymentCreditCard');
+            const pixRadio = document.getElementById('paymentPIX');
+            const bankSlipRadio = document.getElementById('paymentBankSlip');
+            const creditCardFields = document.getElementById('creditCardFields');
+
+            function toggleCreditCardFields() {
+                if (creditCardRadio.checked) {
+                    creditCardFields.style.display = 'block';
+                } else {
+                    creditCardFields.style.display = 'none';
+                }
+            }
+
+            creditCardRadio.addEventListener('change', toggleCreditCardFields);
+            pixRadio.addEventListener('change', toggleCreditCardFields);
+            bankSlipRadio.addEventListener('change', toggleCreditCardFields);
+
+            // Inicializar
+            toggleCreditCardFields();
+
+            // Formatar número do cartão
+            const cardNumberInput = document.querySelector('input[name="CardNumber"]');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Formatar validade do cartão
+            const cardExpiryInput = document.querySelector('input[name="CardExpiry"]');
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Formatar CPF
+            const cpfInput = document.querySelector('input[name="CPF"]');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Formatar CEP
+            const zipCodeInput = document.querySelector('input[name="ZipCode"]');
+            if (zipCodeInput) {
+                zipCodeInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 8) {
+                        value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Formatar telefone
+            const phoneInput = document.querySelector('input[name="Phone"]');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                    }
+                    e.target.value = value;
+                });
+            }
+        });
+    </script>
+}
