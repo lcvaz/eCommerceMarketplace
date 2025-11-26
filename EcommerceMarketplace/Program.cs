@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using EcommerceMarketplace.Data;
 using EcommerceMarketplace.Models;
+using EcommerceMarketplace.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,20 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // ========== OUTROS SERVIÇOS ==========
+
+// ===== SERVIÇO DE EMAIL =====
+// Registra o EmailService como Scoped (uma instância por requisição HTTP)
+//
+// LIFETIME EXPLICADO:
+// - Transient: Nova instância SEMPRE que solicitado
+// - Scoped: Uma instância POR REQUISIÇÃO HTTP (recomendado para serviços que usam DbContext)
+// - Singleton: UMA instância para TODA a aplicação (cuidado com thread-safety)
+//
+// Escolhemos Scoped porque o EmailService pode ser usado várias vezes durante
+// uma mesma requisição (ex: enviar email e registrar no banco), mas queremos
+// uma nova instância para cada requisição diferente.
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Adiciona suporte a Controllers com Views (MVC)
 builder.Services.AddControllersWithViews();

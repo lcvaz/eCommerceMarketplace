@@ -45,6 +45,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
     public DbSet<Address> Addresses { get; set; }
     public DbSet<CustomerAddress> CustomerAddresses { get; set; }
 
+    public DbSet<PaymentConfirmationToken> PaymentConfirmationTokens { get; set; }
+
     // ========== CONFIGURAÇÕES DE RELACIONAMENTOS ==========
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -248,12 +250,22 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
 
         // ===== RELACIONAMENTO: Order → Address (N:1) =====
         // Um pedido tem UM endereço de entrega
-        
+
         modelBuilder.Entity<Order>()
             .HasOne(o => o.ShippingAddress)
             .WithMany(a => a.Orders)
             .HasForeignKey(o => o.ShippingAddressId)
             .OnDelete(DeleteBehavior.Restrict);  // Não pode deletar endereço usado em pedidos
+
+        // ===== RELACIONAMENTO: Order → PaymentConfirmationTokens (1:N) =====
+        // Um pedido pode ter vários tokens de confirmação (caso o cliente peça reenvio)
+        // mas normalmente terá apenas um
+
+        modelBuilder.Entity<PaymentConfirmationToken>()
+            .HasOne(t => t.Order)
+            .WithMany()  // Order não precisa ter navegação para tokens
+            .HasForeignKey(t => t.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);  // Se deletar pedido, deleta tokens
 
         // ===== ÍNDICES PARA PERFORMANCE =====
         
@@ -293,7 +305,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> // entre 
 
         modelBuilder.Entity<Order>()
             .HasIndex(o => new { o.CustomerId, o.CreatedAt }); // Buscar pedidos de um cliente por data fica rápido
-                
+
+        // Índice em Token (buscas para validação de pagamento)
+        modelBuilder.Entity<PaymentConfirmationToken>()
+            .HasIndex(t => t.Token)
+            .IsUnique();  // Cada token é único
+
+        // Índice em OrderId (buscar tokens de um pedido)
+        modelBuilder.Entity<PaymentConfirmationToken>()
+            .HasIndex(t => t.OrderId);
+
 
         // ===== SEED DATA (OPCIONAL) =====
         // Você pode adicionar dados iniciais aqui no futuro

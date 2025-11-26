@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Estoque Insuficiente";
+}
+
+<!--
+    VIEW - ESTOQUE INSUFICIENTE
+
+    Exibida quando o cliente confirma o pagamento mas os produtos não têm mais estoque.
+
+    DADOS RECEBIDOS VIA VIEWBAG:
+    - ViewBag.ErrorMessage: Mensagem sobre o problema
+    - ViewBag.StockProblems: Lista de produtos sem estoque
+    - ViewBag.OrderNumber: Número do pedido
+-->
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Ícone de Estoque -->
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="bi bi-box-seam-fill text-danger" style="font-size: 6rem;"></i>
+                </div>
+                <h1 class="display-5 mb-3">Estoque Insuficiente</h1>
+                <p class="lead text-muted">@ViewBag.ErrorMessage</p>
+            </div>
+
+            <!-- Card com Problemas de Estoque -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Produtos Indisponíveis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        @foreach (var problem in ViewBag.StockProblems as List<string>)
+                        {
+                            <li class="mb-2">@problem</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card com Instruções -->
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-info-circle me-2"></i>O que aconteceu?
+                    </h5>
+                    <p class="mb-2">
+                        <strong>Pedido:</strong> @ViewBag.OrderNumber
+                    </p>
+                    <p class="mb-0">
+                        Entre o momento em que você fez o pedido e a confirmação do pagamento,
+                        alguns produtos esgotaram. Pedimos desculpas pelo inconveniente.
+                        Entre em contato conosco para que possamos ajudá-lo a encontrar produtos alternativos
+                        ou processar o reembolso.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card com Contato -->
+            <div class="card bg-info bg-opacity-10 border-info mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-headset me-2"></i>Entre em Contato
+                    </h5>
+                    <ul class="mb-0">
+                        <li>Email: suporte@marketplace.com</li>
+                        <li>WhatsApp: (11) 99999-9999</li>
+                        <li>Horário: Segunda a Sexta, 9h às 18h</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botão de Voltar -->
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-dark btn-lg">
+                    <i class="bi bi-house-door me-2"></i>Voltar ao Início
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
